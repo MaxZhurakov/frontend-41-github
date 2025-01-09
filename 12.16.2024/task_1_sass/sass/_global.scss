@@ -1,0 +1,3 @@
+body{
+    @include my-mixin($bg-color, $text-color, $padding-size)
+}

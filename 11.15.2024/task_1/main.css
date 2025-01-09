@@ -1,0 +1,60 @@
+/* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+.container {
+    display: flex;
+    width: 1000px;
+    margin: 20px auto;
+    gap: 10px;
+    background-color: #fff;
+    padding: 10px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.item {
+    flex-basis: 200px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid #ddd;
+    background-color: #eef;
+    color: #333;
+}
+
+.task-1 .flex-grow-1 {
+    flex-grow: 1;
+}
+
+.task-1 .flex-grow-2 {
+    flex-grow: 2;
+    background-color: #cfe3ff;
+}
+
+.task-2 .flex-shrink-1 {
+    flex-shrink: 1;
+    flex-basis: 250px;
+    background-color: #ffefe0;
+}
+
+.task-2 .flex-shrink-0 {
+    flex-shrink: 0;
+    flex-basis: 250px;
+    background-color: #ffe0e0;
+}
+
+.task-3 .flex-shrink-1 {
+    flex-shrink: 1;
+    flex-basis: 250px;
+    background-color: #eaffea;
+}
+
+.task-3 .flex-shrink-2 {
+    flex-shrink: 2;
+    flex-basis: 250px;
+    background-color: #e0f7ff;
+}
