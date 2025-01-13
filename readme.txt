@@ -1,1 +1,13 @@
 Biliuk
+"liveSassCompile.settings.formats": [
+    {
+      "format": "expanded",
+      "extensionName": ".css",
+      "savePath": "/css",
+
+      "savePathReplacementPairs": null
+    }
+  ],
+
+  "liveSassCompile.settings.autoprefix": ["> 1%", "last 2 versions"],
+  "liveSassCompile.settings.generateMap": true,
