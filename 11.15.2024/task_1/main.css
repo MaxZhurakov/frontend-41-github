@@ -1,60 +1,51 @@
-/* styles.css */
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
-    background-color: #f4f4f4;
-}
-
-.container {
+    margin: 20px;
+  }
+  
+  .flex-container {
     display: flex;
     width: 1000px;
     margin: 20px auto;
-    gap: 10px;
-    background-color: #fff;
-    padding: 10px;
-    border: 1px solid #ccc;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.item {
-    flex-basis: 200px;
-    padding: 20px;
+  }
+  
+  .flex-item {
     text-align: center;
-    border: 1px solid #ddd;
-    background-color: #eef;
-    color: #333;
-}
+    padding: 20px;
+    color: black;
+  }
+  
 
-.task-1 .flex-grow-1 {
+  .task-1 .flex-item {
+    flex-basis: 200px;
+  }
+  .task-1 .flex-item:nth-child(-n+3) {
     flex-grow: 1;
-}
-
-.task-1 .flex-grow-2 {
+    background-color: rgb(255, 0, 0);
+  }
+  .task-1 .flex-item:last-child {
     flex-grow: 2;
-    background-color: #cfe3ff;
-}
+    background-color: rgb(247, 132, 132);
+  }
+  
 
-.task-2 .flex-shrink-1 {
-    flex-shrink: 1;
+  .task-2 .flex-item {
     flex-basis: 250px;
-    background-color: #ffefe0;
-}
-
-.task-2 .flex-shrink-0 {
+    flex-shrink: 1;
+    background-color: rgb(255, 0, 0);
+  }
+  .task-2 .flex-item:last-child {
     flex-shrink: 0;
+    background-color: rgb(247, 132, 132);
+  }
+  
+ 
+  .task-3 .flex-item {
     flex-basis: 250px;
-    background-color: #ffe0e0;
-}
-
-.task-3 .flex-shrink-1 {
     flex-shrink: 1;
-    flex-basis: 250px;
-    background-color: #eaffea;
-}
-
-.task-3 .flex-shrink-2 {
+    background-color: rgb(255, 0, 0);
+  }
+  .task-3 .flex-item:last-child {
     flex-shrink: 2;
-    flex-basis: 250px;
-    background-color: #e0f7ff;
-}
+    background-color: rgb(247, 132, 132);
+  }
+  
