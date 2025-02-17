@@ -1,53 +1,24 @@
-var userName = "John Doe";
-let userEmail = "john.doe@example.com";
-const userAge = 30;
+alert("Ласка, введіть своє ім'я.");
 
-console.log("User Name:", userName);
-console.log("User Email:", userEmail);
-console.log("User Age:", userAge);
+const userName = prompt("Введіть ваше ім'я:");
+console.log("Введене ім'я:", userName);
 
-userName = "Jane Doe";
-userEmail = "jane.doe@example.com";
+const isConfirmed = confirm("Ви впевнені, що хочете продовжити?");
+console.log("Підтвердження:", isConfirmed);
 
-console.log("Updated User Name:", userName);
-console.log("Updated User Email:", userEmail);
+const book = {
+    title: "1984",
+    author: "Джордж Оруелл",
+    year: 1949,
+    genre: "Дистопія"
+};
 
-console.warn("Cannot change the value of a const variable.");
+console.log("Назва книги:", book.title);
+console.log("Автор:", book.author);
+console.log("Рік видання:", book.year);
+console.log("Жанр:", book.genre);
 
-var globVariable = "var Видима глобально";
-console.log(globVariable);
+const colors = ["червоний", "синій", "зелений", "жовтий"];
 
-{
-    globVariable = "var Перезапис глобальної змінної";
-    console.log(globVariable);
-
-    var globVariable = "var Перевизначення глобально і в блоці";
-    console.log(globVariable);
-}
-
-console.log(globVariable);
-
-let blockScopedVariable = "Видима глобально";
-console.log(blockScopedVariable);
-
-{
-    let blockScopedVariable = "Видима тільки в цьому блоці";
-    console.log(blockScopedVariable);
-}
-
-console.log(blockScopedVariable);
-
-blockScopedVariable = "Перезапис глобальної змінної";
-console.log(blockScopedVariable);
-
-const constVariable = "Видима глобально";
-console.log(constVariable);
-
-{
-    let constVariable = "Видима тільки в цьому блоці";
-    console.log(constVariable);
-}
-
-console.log(constVariable);
-
-console.error("Cannot reassign a value to a const variable.");
+console.log("Перший колір:", colors[0]);
+console.log("Останній колір:", colors[colors.length - 1]);
