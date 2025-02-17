@@ -1,53 +1,85 @@
-// Завдання 1: Визначення вікової категорії
-const age = parseInt(prompt("Введіть ваш вік:"));
+// Завдання 7: Знижка на покупку
+const purchaseAmount = parseFloat(prompt("Введіть суму покупки:"));
+let discount = 0;
 
-if (age >= 0 && age <= 12) {
-    console.log("Ви дитина.");
-} else if (age <= 18) {
-    console.log("Ви підліток.");
-} else if (age <= 60) {
-    console.log("Ви дорослий.");
+if (purchaseAmount >= 200 && purchaseAmount < 300) {
+    discount = 3;
+} else if (purchaseAmount >= 300 && purchaseAmount < 500) {
+    discount = 5;
+} else if (purchaseAmount >= 500) {
+    discount = 7;
+}
+
+const finalAmount = purchaseAmount - (purchaseAmount * discount / 100);
+console.log(`Сума до сплати зі знижкою: ${finalAmount.toFixed(2)}`);
+
+// Завдання 8: Вікторина
+let score = 0;
+
+const answer1 = prompt("Столиця Франції? a) Лондон, b) Париж, c) Берлін");
+if (answer1 === "b") {
+    score += 2;
+}
+
+const answer2 = prompt("2 + 2 = ? a) 3, b) 4, c) 5");
+if (answer2 === "b") {
+    score += 2;
+}
+
+const answer3 = prompt("Столиця Німеччини? a) Лондон, b) Париж, c) Берлін");
+if (answer3 === "c") {
+    score += 2;
+}
+
+console.log(`Ви набрали ${score} балів.`);
+
+// Завдання 9: Пригоди в Кодовці
+let hungerLevel = 10;
+let wallet = 100;
+let pizzaAvailable = null;
+let mood = "😐";
+
+if (hungerLevel !== 0) {
+    console.log("🍕 Я дуже хочу піцу! Голодування — це не про мене!");
 } else {
-    console.log("Ви пенсіонер.");
+    console.log("👌 Я ситий і готовий до кодування!");
 }
 
-// Завдання 2: Виведення спеціального символу
-const number = parseInt(prompt("Введіть число від 0 до 9:"));
+let availablePizza = pizzaAvailable ?? "На жаль, сьогодні без піци... 😢";
+console.log(`🔍 Результат пошуку піци: ${availablePizza}`);
 
-switch (number) {
-    case 1: console.log("!"); break;
-    case 2: console.log("@"); break;
-    case 3: console.log("#"); break;
-    case 4: console.log("$"); break;
-    case 5: console.log("%"); break;
-    case 6: console.log("^"); break;
-    case 7: console.log("&"); break;
-    case 8: console.log("*"); break;
-    case 9: console.log("("); break;
-    case 0: console.log(")"); break;
-    default: console.log("Невідоме число.");
-}
-
-// Завдання 3: Перевірка на однакові цифри
-const num = prompt("Введіть тризначне число:");
-
-if (num[0] === num[1] || num[1] === num[2] || num[0] === num[2]) {
-    console.log("Число містить однакові цифри.");
+let buyPizza = wallet >= 50 && hungerLevel > 5;
+if (buyPizza) {
+    console.log("💸 Трата виправдана, піца того варта!");
+    wallet -= 50;
+    hungerLevel -= 7;
+    mood = "😋";
 } else {
-    console.log("Число не містить однакових цифр.");
+    console.log("🤑 Ні-ні, гроші краще зберегти!");
 }
 
-// Завдання 4: Перевірка високосного року
-const year = parseInt(prompt("Введіть рік:"));
+let snackPrice = wallet < 50 || "Закуска не по кишені...";
+console.log(`🥪 Альтернатива піці: ${wallet >= 50 ? 'Взяв дешеву закуску' : snackPrice}`);
 
-if ((year % 400 === 0) || (year % 4 === 0 && year % 100 !== 0)) {
-    console.log("Рік високосний.");
+let energyLevel = 8;
+energyLevel -= 5;
+console.log(`🚶‍♂️ Енергія після пошуків: ${energyLevel}`);
+if (energyLevel > 3) {
+    console.log("💪 Йду гуляти! Енергії вистачить!");
+    energyLevel += 3;
 } else {
-    console.log("Рік не високосний.");
+    console.log("😴 Лежу вдома, сил немає...");
 }
 
-// Завдання 5: Перевірка на паліндром
-const numStr = prompt("Введіть п'ятирозрядне число:");
+let daySummary = mood === "😋" || "День був звичайним";
+let finalMood = daySummary ?? "Взагалі все було сумно...";
+console.log(`📅 Підсумок дня: ${finalMood}`);
 
-const isPalindrome = (numStr === numStr.split('').reverse().join('')) ? "Число є паліндромом." : "Число не є паліндромом.";
-console.log(isPalindrome);
+if (pizzaAvailable) {
+    hungerLevel *= 0.5;
+    console.log(`🍕 Голод тепер на рівні: ${hungerLevel}`);
+} else {
+    console.log("❌ Піцу так і не знайшов...");
+}
+
+console.log("🌙 Лягаю спати. Мій гаманець: " + wallet + ", настрій: " + mood);
