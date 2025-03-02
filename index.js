@@ -1,55 +1,74 @@
 //1
-const pizzaShop = {
-    takeOrder: function(pizzaName, callback) {
-        console.log(`Піцайоло Марко прийняв замовлення на піцу: ${pizzaName}`);
-        callback.call(this, pizzaName);
+const detectiveStoryCharacters = [
+    { name: "Alice", age: 27, profession: "Investigator", mysterySolved: true },
+    { name: "Bob", age: 32, profession: "Analyst", mysterySolved: false },
+    { name: "Charlie", age: 29, profession: "Forensic Expert", mysterySolved: true }
+];
+
+function showCharacterDetails(characters) {
+    characters.forEach(character => {
+        console.log(`Character Name: ${character.name}, Age: ${character.age}`);
+    });
+}
+
+showCharacterDetails(detectiveStoryCharacters);
+
+delete detectiveStoryCharacters[1].mysterySolved;
+console.log('mysterySolved' in detectiveStoryCharacters[1]); 
+
+function hasProperty(character, propertyName) {
+    return character.hasOwnProperty(propertyName);
+}
+
+console.log(hasProperty(detectiveStoryCharacters[2], 'age')); 
+
+const additionalCharacter = Object.create(detectiveStoryCharacters[0]);
+additionalCharacter.name = "Diana";
+additionalCharacter.age = 31;
+console.log(additionalCharacter);
+
+function listAllProperties(obj) {
+    for (let prop in obj) {
+        if (obj.hasOwnProperty(prop)) {
+            console.log(`Property: ${prop}, Value: ${obj[prop]}`);
+        }
+    }
+}
+
+listAllProperties(detectiveStoryCharacters[2]);
+
+const teamMembers = ["Alice", "Bob", "Charlie", "Diana"];
+
+function showNames(arr) {
+    console.log(`Second member: ${arr[1]}`);
+    console.log(`Fourth member: ${arr[3]}`);
+}
+
+showNames(teamMembers);
+
+function displayTeamMembers(arr) {
+    arr.forEach(member => {
+        console.log(`Character ${member} is part of the investigation team.`);
+    });
+}
+
+displayTeamMembers(teamMembers);
+
+const investigator = {
+    name: "Alice",
+    showName: function() {
+        console.log(`Investigator's Name: ${this.name}`);
     }
 };
 
-function orderReady(pizzaName) {
-    console.log(`Піца ${pizzaName} готова!`);
-}
+investigator.showName();
 
-pizzaShop.takeOrder("Пепероні", orderReady);
-//2
-const theater = {
-    actors: ["Олег", "Марина", "Вася"],
-    assignRole: function(actorName, callback) {
-        const role = "Гамлет";
-        callback.call(this, actorName, role);
-    }
+const baseInvestigator = {
+    name: "Alice",
+    age: 27
 };
 
-function assignRoleCallback(actorName, role) {
-    console.log(`Актор ${actorName} грає роль: ${role}`);
-}
+const specializedInvestigator = Object.create(baseInvestigator);
+specializedInvestigator.role = "Lead Investigator";
 
-theater.assignRole("Олег", assignRoleCallback);
-//3
-const taxiDriver = {
-    name: "Іван",
-    pickUpPassenger: function(passengerName, callback) {
-        callback.call(this, passengerName);
-    }
-};
-
-function pickUpCallback(passengerName) {
-    console.log(`Таксист ${this.name} підбирає пасажира ${passengerName}`);
-    console.log("Поїздка почалась!");
-}
-
-taxiDriver.pickUpPassenger("Марія", pickUpCallback);
-//4
-const concert = {
-    startShow: function(callback) {
-        const song = "Літній вечір";
-        callback.call(this, song);
-    }
-};
-
-function startShowCallback(song) {
-    console.log(`Співак Олександр виконує пісню: "${song}"`);
-}
-
-concert.startShow(startShowCallback);
-//5
+console.log(`Name: ${specializedInvestigator.name}, Age: ${specializedInvestigator.age}, Role: ${specializedInvestigator.role}`);
