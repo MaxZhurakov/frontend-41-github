@@ -1,81 +1,54 @@
 //1
-import React, { useEffect, useState } from 'react';
-
-const heroes = [
-    { name: "Бетмен", power: 80 },
-    { name: "Флеш", power: 90 },
-    { name: "Кіт у чоботях", power: 40 },
-    { name: "Ливоліка", power: 100 }
-];
-
-const Academy = () => {
-    const [strongHeroes, setStrongHeroes] = useState([]);
-
-    useEffect(() => {
-        const filterStrongHeroes = (heroes) => {
-            return heroes.filter(hero => hero.power > 50);
-        };
-
-        const filteredHeroes = filterStrongHeroes(heroes);
-        setStrongHeroes(filteredHeroes);
-    }, []);
-
-    return (
-        <div id="hero-list">
-            {strongHeroes.map((hero, index) => (
-                <div key={index}>{hero.name}</div>
-            ))}
-        </div>
-    );
+const pizzaShop = {
+    takeOrder: function(pizzaName, callback) {
+        console.log(`Піцайоло Марко прийняв замовлення на піцу: ${pizzaName}`);
+        callback.call(this, pizzaName);
+    }
 };
 
-export default Academy;
+function orderReady(pizzaName) {
+    console.log(`Піца ${pizzaName} готова!`);
+}
 
+pizzaShop.takeOrder("Пепероні", orderReady);
 //2
-import React, { useState } from 'react';
-
-const MaskGenerator = () => {
-    const [name, setName] = useState('');
-    const [color, setColor] = useState('#ffffff');
-    const [masks, setMasks] = useState([]);
-
-    const generateMask = () => {
-        setMasks([...masks, { name, color }]);
-    };
-
-    return (
-        <div>
-            <input
-                type="text"
-                placeholder="Ім'я"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-            />
-            <input
-                type="color"
-                value={color}
-                onChange={(e) => setColor(e.target.value)}
-            />
-            <button onClick={generateMask}>Готово!</button>
-            <div id="mask-container">
-                {masks.map((mask, index) => (
-                    <div
-                        key={index}
-                        className="mask"
-                        style={{ backgroundColor: mask.color }}
-                    >
-                        {mask.name}
-                    </div>
-                ))}
-            </div>
-            <style jsx>{`
-                .mask {
-                    padding: 10px;
-                    margin: 5px;
-                    border: 1px solid #000;
-                    display: inline-block;
-                }
-            `}</style>
-        </div>
-    );
+const theater = {
+    actors: ["Олег", "Марина", "Вася"],
+    assignRole: function(actorName, callback) {
+        const role = "Гамлет";
+        callback.call(this, actorName, role);
+    }
 };
+
+function assignRoleCallback(actorName, role) {
+    console.log(`Актор ${actorName} грає роль: ${role}`);
+}
+
+theater.assignRole("Олег", assignRoleCallback);
+//3
+const taxiDriver = {
+    name: "Іван",
+    pickUpPassenger: function(passengerName, callback) {
+        callback.call(this, passengerName);
+    }
+};
+
+function pickUpCallback(passengerName) {
+    console.log(`Таксист ${this.name} підбирає пасажира ${passengerName}`);
+    console.log("Поїздка почалась!");
+}
+
+taxiDriver.pickUpPassenger("Марія", pickUpCallback);
+//4
+const concert = {
+    startShow: function(callback) {
+        const song = "Літній вечір";
+        callback.call(this, song);
+    }
+};
+
+function startShowCallback(song) {
+    console.log(`Співак Олександр виконує пісню: "${song}"`);
+}
+
+concert.startShow(startShowCallback);
