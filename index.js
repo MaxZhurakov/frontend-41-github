@@ -1,33 +1,69 @@
 //1
-let products = ["хліб", "молоко", "яблука", "шоколад", "банани"];
-let index = 0;
-
-while (index < products.length) {
-    let product = products[index];
-    console.log(`Додаємо ${product} у кошик...`);
-
-    if (product === "шоколад") {
-        console.log("Солодке життя забезпечене!");
+for (let step = 1; step <= 7; step++) {
+    switch (step) {
+        case 1:
+            console.log("1: Візьміть яйця.");
+            break;
+        case 2:
+            console.log("2: Розбийте їх у миску.");
+            break;
+        case 3:
+            if (confirm("Чи хочете додати сіль?")) {
+                console.log("3: Додайте сіль і перець.");
+            } else {
+                console.log("3: Пропускаємо додавання солі.");
+                continue;
+            }
+            break;
+        case 4:
+            console.log("4: Добре збийте.");
+            break;
+        case 5:
+            console.log("5: Нагрійте сковорідку.");
+            if (confirm("Чи ви вже голодні?")) {
+                console.log("Ну, тоді їж сирі яйця 😅");
+                break;
+            }
+            break;
+        case 6:
+            console.log("6: Вилийте яйця на сковорідку.");
+            break;
+        case 7:
+            console.log("7: Готуйте до готовності.");
+            break;
     }
-
-    index++;
 }
-
-console.log("Всі продукти у кошику! Тепер можна йти на касу.");
-
 //2
-function multiplyNumbers(num) {
-    if (num < 1 || num > 100) {
-        console.log("Це фабрика для реальних чисел! Давай щось нормальне 😏");
-        return;
-    }
-
-    console.log(`Таблиця множення для числа ${num}:`);
-    for (let i = 1; i <= 10; i++) {
-        console.log(`${num} x ${i} = ${num * i}`);
+function greetUser(name, age) {
+    if (age < 18) {
+        return `Привіт, ${name}! Ти ще молодий і маєш багато часу для навчання JS!`;
+    } else if (age === 0) {
+        return `Ого, ${name}! Ти мабуть не існуєш!`;
+    } else if (age >= 18 && age <= 30) {
+        return `Привіт, ${name}! Час вивчати JS і будувати кар'єру!`;
+    } else {
+        return `Привіт, ${name}! Ніколи не пізно почати нове хобі — чому б не JS?`;
     }
 }
 
-multiplyNumbers(5);
-multiplyNumbers(101);
-multiplyNumbers(-3);
+console.log(greetUser("Аліса", 16));
+console.log(greetUser("Боб", 0));
+console.log(greetUser("Карл", 25));
+console.log(greetUser("Дейв", 35));
+//3
+function greetUser(name, age) {
+    if (age < 18) {
+        return `Привіт, ${name}! Ти ще молодий і маєш багато часу для навчання JS!`;
+    } else if (age === 0) {
+        return `Ого, ${name}! Ти мабуть не існуєш!`;
+    } else if (age >= 18 && age <= 30) {
+        return `Привіт, ${name}! Час вивчати JS і будувати кар'єру!`;
+    } else {
+        return `Привіт, ${name}! Ніколи не пізно почати нове хобі — чому б не JS?`;
+    }
+}
+
+console.log(greetUser("Аліса", 16));
+console.log(greetUser("Боб", 0));
+console.log(greetUser("Карл", 25));
+console.log(greetUser("Дейв", 35));
