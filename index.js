@@ -1,69 +1,81 @@
 //1
-for (let step = 1; step <= 7; step++) {
-    switch (step) {
-        case 1:
-            console.log("1: Візьміть яйця.");
-            break;
-        case 2:
-            console.log("2: Розбийте їх у миску.");
-            break;
-        case 3:
-            if (confirm("Чи хочете додати сіль?")) {
-                console.log("3: Додайте сіль і перець.");
-            } else {
-                console.log("3: Пропускаємо додавання солі.");
-                continue;
-            }
-            break;
-        case 4:
-            console.log("4: Добре збийте.");
-            break;
-        case 5:
-            console.log("5: Нагрійте сковорідку.");
-            if (confirm("Чи ви вже голодні?")) {
-                console.log("Ну, тоді їж сирі яйця 😅");
-                break;
-            }
-            break;
-        case 6:
-            console.log("6: Вилийте яйця на сковорідку.");
-            break;
-        case 7:
-            console.log("7: Готуйте до готовності.");
-            break;
-    }
-}
+import React, { useEffect, useState } from 'react';
+
+const heroes = [
+    { name: "Бетмен", power: 80 },
+    { name: "Флеш", power: 90 },
+    { name: "Кіт у чоботях", power: 40 },
+    { name: "Ливоліка", power: 100 }
+];
+
+const Academy = () => {
+    const [strongHeroes, setStrongHeroes] = useState([]);
+
+    useEffect(() => {
+        const filterStrongHeroes = (heroes) => {
+            return heroes.filter(hero => hero.power > 50);
+        };
+
+        const filteredHeroes = filterStrongHeroes(heroes);
+        setStrongHeroes(filteredHeroes);
+    }, []);
+
+    return (
+        <div id="hero-list">
+            {strongHeroes.map((hero, index) => (
+                <div key={index}>{hero.name}</div>
+            ))}
+        </div>
+    );
+};
+
+export default Academy;
+
 //2
-function greetUser(name, age) {
-    if (age < 18) {
-        return `Привіт, ${name}! Ти ще молодий і маєш багато часу для навчання JS!`;
-    } else if (age === 0) {
-        return `Ого, ${name}! Ти мабуть не існуєш!`;
-    } else if (age >= 18 && age <= 30) {
-        return `Привіт, ${name}! Час вивчати JS і будувати кар'єру!`;
-    } else {
-        return `Привіт, ${name}! Ніколи не пізно почати нове хобі — чому б не JS?`;
-    }
-}
+import React, { useState } from 'react';
 
-console.log(greetUser("Аліса", 16));
-console.log(greetUser("Боб", 0));
-console.log(greetUser("Карл", 25));
-console.log(greetUser("Дейв", 35));
-//3
-function greetUser(name, age) {
-    if (age < 18) {
-        return `Привіт, ${name}! Ти ще молодий і маєш багато часу для навчання JS!`;
-    } else if (age === 0) {
-        return `Ого, ${name}! Ти мабуть не існуєш!`;
-    } else if (age >= 18 && age <= 30) {
-        return `Привіт, ${name}! Час вивчати JS і будувати кар'єру!`;
-    } else {
-        return `Привіт, ${name}! Ніколи не пізно почати нове хобі — чому б не JS?`;
-    }
-}
+const MaskGenerator = () => {
+    const [name, setName] = useState('');
+    const [color, setColor] = useState('#ffffff');
+    const [masks, setMasks] = useState([]);
 
-console.log(greetUser("Аліса", 16));
-console.log(greetUser("Боб", 0));
-console.log(greetUser("Карл", 25));
-console.log(greetUser("Дейв", 35));
+    const generateMask = () => {
+        setMasks([...masks, { name, color }]);
+    };
+
+    return (
+        <div>
+            <input
+                type="text"
+                placeholder="Ім'я"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+            />
+            <input
+                type="color"
+                value={color}
+                onChange={(e) => setColor(e.target.value)}
+            />
+            <button onClick={generateMask}>Готово!</button>
+            <div id="mask-container">
+                {masks.map((mask, index) => (
+                    <div
+                        key={index}
+                        className="mask"
+                        style={{ backgroundColor: mask.color }}
+                    >
+                        {mask.name}
+                    </div>
+                ))}
+            </div>
+            <style jsx>{`
+                .mask {
+                    padding: 10px;
+                    margin: 5px;
+                    border: 1px solid #000;
+                    display: inline-block;
+                }
+            `}</style>
+        </div>
+    );
+};
