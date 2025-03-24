@@ -1,52 +1,103 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Фабрика чарівних зіллів</title>
+    <title>Музичний плейлист</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #playlist {
+            list-style-type: none;
+            padding: 0;
+        }
+        #playlist li {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        #totalTime {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
+    <h1>Музичний плейлист</h1>
+    <div>
+        <input type="text" id="songName" placeholder="Назва пісні">
+        <input type="number" id="songDuration" placeholder="Тривалість (хв)">
+        <button id="addSongButton">Додати пісню</button>
+    </div>
+    <ul id="playlist"></ul>
+    <div>
+        <button id="sortByNameButton">Сортувати за назвою</button>
+        <button id="sortByDurationButton">Сортувати за тривалістю</button>
+        <button id="calculateTotalDurationButton">Підрахувати загальну тривалість</button>
+    </div>
+    <div id="totalTime"></div>
+
     <script>
-        // Крок 1: Початкові дані
-        let potions = [
-            { name: "Зілля сили", effect: "Збільшує силу", price: 50, quantity: 10 },
-            { name: "Зілля невидимості", effect: "Робить невидимим", price: 80, quantity: 5 },
-            { name: "Зілля швидкості", effect: "Збільшує швидкість", price: 60, quantity: 8 },
-            { name: "Зілля здоров'я", effect: "Відновлює здоров'я", price: 60, quantity: 8 },
-            { name: "Зілля мани", effect: "Відновлює ману", price: 70, quantity: 7 }
-        ];
-        potions.splice(1, 1); 
+        const BaseSong = {
+            getInfo: function() {
+                return `${this.name} - ${this.duration} хв`;
+            }
+        };
 
-        potions.unshift({ name: "Зілля розуму", effect: "Збільшує інтелект", price: 90, quantity: 4 });
+        function createSong(name, duration) {
+            const song = Object.create(BaseSong);
+            song.name = name;
+            song.duration = duration;
+            return song;
+        }
 
-        let extraPotions = [
-            { name: "Зілля удачі", effect: "Приносить удачу", price: 120, quantity: 6 },
-            { name: "Зілля відваги", effect: "Додає хоробрість", price: 75, quantity: 7 }
-        ];
-        potions = potions.concat(extraPotions);
-        potions.forEach(potion => {
-            if (potion.name === "Зілля здоров'я") {
-                potion.quantity -= 2;
+        const playlist = [];
+
+        function updatePlaylist() {
+            const playlistElement = document.getElementById('playlist');
+            playlistElement.innerHTML = '';
+            playlist.forEach((song, index) => {
+                const li = document.createElement('li');
+                li.textContent = song.getInfo();
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Видалити';
+                deleteButton.addEventListener('click', () => {
+                    playlist.splice(index, 1);
+                    updatePlaylist();
+                });
+                li.appendChild(deleteButton);
+                playlistElement.appendChild(li);
+            });
+        }
+
+        document.getElementById('addSongButton').addEventListener('click', () => {
+            const name = document.getElementById('songName').value;
+            const duration = parseInt(document.getElementById('songDuration').value);
+            if (name && !isNaN(duration)) {
+                const song = createSong(name, duration);
+                playlist.push(song);
+                updatePlaylist();
+            } else {
+                alert('Будь ласка, введіть коректні дані.');
             }
         });
-        let potionDescriptions = potions.map(potion =>
-            `${potion.name}: ${potion.effect} (${potion.price} золотих), в наявності: ${potion.quantity} шт.`
-        );
-        let potionList = potions.map(potion => potion.name).join(", ");
 
-        potions.sort((a, b) => a.price - b.price);
+        document.getElementById('sortByNameButton').addEventListener('click', () => {
+            playlist.sort((a, b) => a.name.localeCompare(b.name));
+            updatePlaylist();
+        });
 
-        let hasManaPotion = potions.some(potion => potion.name === "Зілля мани");
+        document.getElementById('sortByDurationButton').addEventListener('click', () => {
+            playlist.sort((a, b) => a.duration - b.duration);
+            updatePlaylist();
+        });
 
-        let expensivePotions = potions.filter(potion => potion.price > 60);
-
-        let topPotions = potions.filter(potion => potion.price > 70).slice(0, 3);
-
-        console.log("Опис зіль:", potionDescriptions);
-        console.log("Список зіль:", potionList);
-        console.log("Чи є 'Зілля мани'?", hasManaPotion);
-        console.log("Зілля, що коштують понад 60 золотих:", expensivePotions);
-        console.log("Найкращі зілля:", topPotions);
+        document.getElementById('calculateTotalDurationButton').addEventListener('click', () => {
+            const totalDuration = playlist.reduce((sum, song) => sum + song.duration, 0);
+            document.getElementById('totalTime').textContent = `Загальна тривалість: ${totalDuration} хв`;
+        });
     </script>
 </body>
 </html>
