@@ -1,74 +1,66 @@
-const clues = [
-    { location: "Крабсбургер", clue: "Можливо штанці десь на кухні" },
-    { location: "Дім Сквідварда", clue: "Пахне штанцями, але це Патрік" },
-    { location: "Пляж", clue: "Штанці могли занести хвилею" },
-    { location: "Ресторан", clue: "Штанці не бачили" }
-];
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Прибульці передають повідомлення</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #messages {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 200px;
+            overflow-y: scroll;
+        }
+    </style>
+</head>
+<body>
+    <h1>📡 Прибульці передають повідомлення!</h1>
+    <div id="messages"></div>
 
-function viewAllClueKeys() {
-    clues.forEach(clue => console.log(Object.keys(clue)));
-}
+    <script>
+        const alienMessages = new Set([
+            '🌌 Привіт, земляни! Ви нас чуєте?',
+            '👾 Ми дружні! Хочемо дізнатися про ваш Wi-Fi!',
+            '🚀 Летимо до вас на переговори!',
+            '🌍 Чому ви називаєте себе Homo sapiens? 🤔',
+            '🛸 Ми залишили слід у ваших полях... Вибачте! 🌾',
+            '💡 Передайте нам вашу найкращу технологію!',
+            '🔊 Земляни, ваші меми занадто складні! 😵',
+            "🎶 Ми хочемо дізнатися про вашу музику! Що таке 'хардбас'?",
+        ]);
 
-function viewAllClueEntries() {
-    clues.forEach(clue => console.log(Object.entries(clue)));
-}
+        const aliens = new Map();
 
-function getClueTexts() {
-    return clues.map(clue => Object.values(clue)[1]);
-}
+        function createAlien(name, customMessage = null) {
+            if (customMessage && !alienMessages.has(customMessage)) {
+                alienMessages.add(customMessage);
+            }
 
-function containsPants(clueText) {
-    return clueText.toLowerCase().includes("штанці");
-}
+            const message = customMessage || Array.from(alienMessages)[Math.floor(Math.random() * alienMessages.size)];
+            aliens.set(name, message);
 
-function countWordOccurrences(words) {
-    return words.reduce((acc, word) => {
-        acc[word] = (acc[word] || 0) + 1;
-        return acc;
-    }, {});
-}
+            setTimeout(() => {
+                const messagesDiv = document.getElementById('messages');
+                const messageElement = document.createElement('div');
+                messageElement.textContent = `${name}: ${message}`;
+                messagesDiv.appendChild(messageElement);
+            }, 1000);
+        }
 
-function replacePantsWithGoldenPants(clueText) {
-    return clueText.replace(/штанці/gi, "золоті штанці");
-}
+        let alienCount = 0;
+        const maxAliens = 5;
 
-function filterCluesWithPants() {
-    return clues.filter(clue => containsPants(clue.clue));
-}
-
-function countCluesWithPants() {
-    return filterCluesWithPants().length;
-}
-
-function combineCluesIntoStory() {
-    return clues.map(clue => `${clue.location}: ${clue.clue}`).join(". ");
-}
-
-console.log("Всі ключі підказок:");
-viewAllClueKeys();
-
-console.log("\nВсі пари ключ-значення підказок:");
-viewAllClueEntries();
-
-console.log("\nТексти підказок:");
-console.log(getClueTexts());
-
-console.log("\nПідказки, де згадуються штанці:");
-console.log(filterCluesWithPants());
-
-console.log("\nКількість підказок, де згадуються штанці:");
-console.log(countCluesWithPants());
-
-console.log("\nІсторія пошуку штанців:");
-console.log(combineCluesIntoStory());
-
-console.log("\nПідказки з заміною 'штанці' на 'золоті штанці':");
-const modifiedClues = clues.map(clue => ({
-    ...clue,
-    clue: replacePantsWithGoldenPants(clue.clue)
-}));
-console.log(modifiedClues);
-
-console.log("\nКількість повторень слів у підказках:");
-const allWords = getClueTexts().join(" ").split(/\W+/).filter(Boolean);
-console.log(countWordOccurrences(allWords));
+        setInterval(() => {
+            if (alienCount < maxAliens) {
+                createAlien(`Alien ${alienCount + 1}`);
+                alienCount++;
+            }
+        }, 3000);
+    </script>
+</body>
+</html>
