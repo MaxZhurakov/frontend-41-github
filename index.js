@@ -3,69 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Завдання 1-3</title>
+    <title>
     <style>
-        .item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
         }
-        .item button {
-            margin-left: 10px;
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-//1 
-</body>    <p id="text">Привіт, світ!</p>
-    <button onclick="changeText()">Змінити текст</button>
+// 1 
+    <p onclick="changeColor(this)">Параграф 1</p>
+    <p onclick="changeColor(this)">Параграф 2</p>
+    <p onclick="changeColor(this)">Параграф 3</p>
 
     <hr>
 
-    //2
-    <input type="text" id="itemInput" placeholder="Введіть елемент списку">
-    <button onclick="addItem()">Додати елемент</button>
-    <ul id="itemList"></ul>
+    // 2
+    <button id="openModalBtn">Відкрити модальне вікно</button>
 
-    <hr>
-
-    //3 
-
-    <img id="image" src="initial-image.jpg" alt="Initial Image" width="200">
-    <button onclick="changeImage()">Змінити зображення</button>
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <p>Це модальне вікно.</p>
+            <button onclick="closeModal()">Закрити</button>
+        </div>
+    </div>
 
     <script>
-        // Завдання 1: Зміна тексту елементу
-        function changeText() {
-            document.getElementById('text').innerText = 'Змінений текст';
+    // 1 
+    function changeColor(element) {
+            element.style.color = getRandomColor();
         }
 
-        // Завдання 2: Створення динамічного списку
-        function addItem() {
-            const input = document.getElementById('itemInput');
-            const itemText = input.value.trim();
-
-            if (itemText !== '') {
-                const ul = document.getElementById('itemList');
-                const li = document.createElement('li');
-                li.className = 'item';
-                li.innerText = itemText;
-
-                const deleteButton = document.createElement('button');
-                deleteButton.innerText = 'Видалити';
-                deleteButton.onclick = function() {
-                    ul.removeChild(li);
-                };
-
-                li.appendChild(deleteButton);
-                ul.appendChild(li);
-
-                input.value = '';
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
             }
+            return color;
         }
-        function changeImage() {
-            const image = document.getElementById('image');
-            image.src = 'new-image.jpg';
+
+// 2        
+        const modal = document.getElementById('myModal');
+        const openModalBtn = document.getElementById('openModalBtn');
+
+        openModalBtn.onclick = function() {
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
         }
     </script>
 </body>
