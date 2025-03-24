@@ -3,94 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>
-    <style>
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgb(0,0,0);
-            background-color: rgba(0,0,0,0.4);
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 500px;
-            text-align: center;
-        }
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-    </style>
+    <title>Фабрика чарівних зіллів</title>
 </head>
 <body>
-// 1 
-    <p onclick="changeColor(this)">Параграф 1</p>
-    <p onclick="changeColor(this)">Параграф 2</p>
-    <p onclick="changeColor(this)">Параграф 3</p>
-
-    <hr>
-
-    // 2
-    <button id="openModalBtn">Відкрити модальне вікно</button>
-
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <p>Це модальне вікно.</p>
-            <button onclick="closeModal()">Закрити</button>
-        </div>
-    </div>
-
     <script>
-    // 1 
-    function changeColor(element) {
-            element.style.color = getRandomColor();
-        }
+        // Крок 1: Початкові дані
+        let potions = [
+            { name: "Зілля сили", effect: "Збільшує силу", price: 50, quantity: 10 },
+            { name: "Зілля невидимості", effect: "Робить невидимим", price: 80, quantity: 5 },
+            { name: "Зілля швидкості", effect: "Збільшує швидкість", price: 60, quantity: 8 },
+            { name: "Зілля здоров'я", effect: "Відновлює здоров'я", price: 60, quantity: 8 },
+            { name: "Зілля мани", effect: "Відновлює ману", price: 70, quantity: 7 }
+        ];
+        potions.splice(1, 1); 
 
-        function getRandomColor() {
-            const letters = '0123456789ABCDEF';
-            let color = '#';
-            for (let i = 0; i < 6; i++) {
-                color += letters[Math.floor(Math.random() * 16)];
+        potions.unshift({ name: "Зілля розуму", effect: "Збільшує інтелект", price: 90, quantity: 4 });
+
+        let extraPotions = [
+            { name: "Зілля удачі", effect: "Приносить удачу", price: 120, quantity: 6 },
+            { name: "Зілля відваги", effect: "Додає хоробрість", price: 75, quantity: 7 }
+        ];
+        potions = potions.concat(extraPotions);
+        potions.forEach(potion => {
+            if (potion.name === "Зілля здоров'я") {
+                potion.quantity -= 2;
             }
-            return color;
-        }
+        });
+        let potionDescriptions = potions.map(potion =>
+            `${potion.name}: ${potion.effect} (${potion.price} золотих), в наявності: ${potion.quantity} шт.`
+        );
+        let potionList = potions.map(potion => potion.name).join(", ");
 
-// 2        
-        const modal = document.getElementById('myModal');
-        const openModalBtn = document.getElementById('openModalBtn');
+        potions.sort((a, b) => a.price - b.price);
 
-        openModalBtn.onclick = function() {
-            modal.style.display = 'block';
-        }
+        let hasManaPotion = potions.some(potion => potion.name === "Зілля мани");
 
-        function closeModal() {
-            modal.style.display = 'none';
-        }
+        let expensivePotions = potions.filter(potion => potion.price > 60);
 
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = 'none';
-            }
-        }
+        let topPotions = potions.filter(potion => potion.price > 70).slice(0, 3);
+
+        console.log("Опис зіль:", potionDescriptions);
+        console.log("Список зіль:", potionList);
+        console.log("Чи є 'Зілля мани'?", hasManaPotion);
+        console.log("Зілля, що коштують понад 60 золотих:", expensivePotions);
+        console.log("Найкращі зілля:", topPotions);
     </script>
 </body>
 </html>
