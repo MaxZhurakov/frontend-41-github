@@ -3,64 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Прибульці передають повідомлення</title>
+    <title>Карти передбачень</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
         }
-        #messages {
-            margin-top: 20px;
-            border: 1px solid #ccc;
-            padding: 10px;
-            height: 200px;
-            overflow-y: scroll;
+        #predictionContainer {
+            text-align: center;
+            font-size: 1.2em;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        .positive {
+            color: green;
+        }
+        .neutral {
+            color: blue;
+        }
+        .mysterious {
+            color: purple;
         }
     </style>
 </head>
 <body>
-    <h1>📡 Прибульці передають повідомлення!</h1>
-    <div id="messages"></div>
+    <h1>🔮 Карти передбачень</h1>
+    <div id="predictionContainer">
+        <p id="predictionText"></p>
+        <p id="predictionDate"></p>
+    </div>
+    <button id="getPredictionButton">Отримати передбачення</button>
 
     <script>
-        const alienMessages = new Set([
-            '🌌 Привіт, земляни! Ви нас чуєте?',
-            '👾 Ми дружні! Хочемо дізнатися про ваш Wi-Fi!',
-            '🚀 Летимо до вас на переговори!',
-            '🌍 Чому ви називаєте себе Homo sapiens? 🤔',
-            '🛸 Ми залишили слід у ваших полях... Вибачте! 🌾',
-            '💡 Передайте нам вашу найкращу технологію!',
-            '🔊 Земляни, ваші меми занадто складні! 😵',
-            "🎶 Ми хочемо дізнатися про вашу музику! Що таке 'хардбас'?",
-        ]);
+        const predictions = [
+            { text: "Сьогодні вас чекає успіх!", type: "positive" },
+            { text: "Будьте обережні з новими знайомими.", type: "neutral" },
+            { text: "Вас чекає несподівана зустріч.", type: "mysterious" },
+            { text: "День пройде спокійно, без несподіванок.", type: "neutral" },
+            { text: "Ваші мрії можуть здійснитися!", type: "positive" },
+            { text: "Сьогодні вирішуйте фінансові питання.", type: "neutral" },
+            { text: "Вас чекає приємна новина.", type: "positive" },
+            { text: "Будьте готові до змін.", type: "mysterious" },
+            { text: "День ідеально підходить для нових починань.", type: "positive" },
+            { text: "Сьогодні краще залишитися вдома.", type: "neutral" },
+            { text: "Ваша інтуїція вас не підведе.", type: "mysterious" },
+            { text: "День принесе багато радості.", type: "positive" },
+            { text: "Будьте уважні до дрібниць.", type: "neutral" },
+            { text: "Вас чекає цікава подорож.", type: "mysterious" },
+            { text: "Сьогодні ви зможете вирішити давню проблему.", type: "positive" }
+        ];
 
-        const aliens = new Map();
+        document.getElementById('getPredictionButton').addEventListener('click', () => {
+            const predictionContainer = document.getElementById('predictionContainer');
+            const predictionText = document.getElementById('predictionText');
+            const predictionDate = document.getElementById('predictionDate');
 
-        function createAlien(name, customMessage = null) {
-            if (customMessage && !alienMessages.has(customMessage)) {
-                alienMessages.add(customMessage);
-            }
+            const randomPrediction = predictions[Math.floor(Math.random() * predictions.length)];
+            predictionText.textContent = randomPrediction.text;
+            predictionText.className = randomPrediction.type;
 
-            const message = customMessage || Array.from(alienMessages)[Math.floor(Math.random() * alienMessages.size)];
-            aliens.set(name, message);
+            const currentDate = new Date();
+            predictionDate.textContent = `Сьогодні: ${currentDate.toLocaleDateString()}`;
 
+            predictionContainer.style.opacity = 0;
             setTimeout(() => {
-                const messagesDiv = document.getElementById('messages');
-                const messageElement = document.createElement('div');
-                messageElement.textContent = `${name}: ${message}`;
-                messagesDiv.appendChild(messageElement);
-            }, 1000);
-        }
-
-        let alienCount = 0;
-        const maxAliens = 5;
-
-        setInterval(() => {
-            if (alienCount < maxAliens) {
-                createAlien(`Alien ${alienCount + 1}`);
-                alienCount++;
-            }
-        }, 3000);
+                predictionContainer.style.opacity = 1;
+            }, 100);
+        });
     </script>
 </body>
 </html>
