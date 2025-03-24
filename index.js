@@ -1,74 +1,72 @@
-//1
-const detectiveStoryCharacters = [
-    { name: "Alice", age: 27, profession: "Investigator", mysterySolved: true },
-    { name: "Bob", age: 32, profession: "Analyst", mysterySolved: false },
-    { name: "Charlie", age: 29, profession: "Forensic Expert", mysterySolved: true }
-];
-
-function showCharacterDetails(characters) {
-    characters.forEach(character => {
-        console.log(`Character Name: ${character.name}, Age: ${character.age}`);
-    });
-}
-
-showCharacterDetails(detectiveStoryCharacters);
-
-delete detectiveStoryCharacters[1].mysterySolved;
-console.log('mysterySolved' in detectiveStoryCharacters[1]); 
-
-function hasProperty(character, propertyName) {
-    return character.hasOwnProperty(propertyName);
-}
-
-console.log(hasProperty(detectiveStoryCharacters[2], 'age')); 
-
-const additionalCharacter = Object.create(detectiveStoryCharacters[0]);
-additionalCharacter.name = "Diana";
-additionalCharacter.age = 31;
-console.log(additionalCharacter);
-
-function listAllProperties(obj) {
-    for (let prop in obj) {
-        if (obj.hasOwnProperty(prop)) {
-            console.log(`Property: ${prop}, Value: ${obj[prop]}`);
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Завдання 1-3</title>
+    <style>
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-    }
-}
+        .item button {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+//1 
+</body>    <p id="text">Привіт, світ!</p>
+    <button onclick="changeText()">Змінити текст</button>
 
-listAllProperties(detectiveStoryCharacters[2]);
+    <hr>
 
-const teamMembers = ["Alice", "Bob", "Charlie", "Diana"];
+    //2
+    <input type="text" id="itemInput" placeholder="Введіть елемент списку">
+    <button onclick="addItem()">Додати елемент</button>
+    <ul id="itemList"></ul>
 
-function showNames(arr) {
-    console.log(`Second member: ${arr[1]}`);
-    console.log(`Fourth member: ${arr[3]}`);
-}
+    <hr>
 
-showNames(teamMembers);
+    //3 
 
-function displayTeamMembers(arr) {
-    arr.forEach(member => {
-        console.log(`Character ${member} is part of the investigation team.`);
-    });
-}
+    <img id="image" src="initial-image.jpg" alt="Initial Image" width="200">
+    <button onclick="changeImage()">Змінити зображення</button>
 
-displayTeamMembers(teamMembers);
+    <script>
+        // Завдання 1: Зміна тексту елементу
+        function changeText() {
+            document.getElementById('text').innerText = 'Змінений текст';
+        }
 
-const investigator = {
-    name: "Alice",
-    showName: function() {
-        console.log(`Investigator's Name: ${this.name}`);
-    }
-};
+        // Завдання 2: Створення динамічного списку
+        function addItem() {
+            const input = document.getElementById('itemInput');
+            const itemText = input.value.trim();
 
-investigator.showName();
+            if (itemText !== '') {
+                const ul = document.getElementById('itemList');
+                const li = document.createElement('li');
+                li.className = 'item';
+                li.innerText = itemText;
 
-const baseInvestigator = {
-    name: "Alice",
-    age: 27
-};
+                const deleteButton = document.createElement('button');
+                deleteButton.innerText = 'Видалити';
+                deleteButton.onclick = function() {
+                    ul.removeChild(li);
+                };
 
-const specializedInvestigator = Object.create(baseInvestigator);
-specializedInvestigator.role = "Lead Investigator";
+                li.appendChild(deleteButton);
+                ul.appendChild(li);
 
-console.log(`Name: ${specializedInvestigator.name}, Age: ${specializedInvestigator.age}, Role: ${specializedInvestigator.role}`);
+                input.value = '';
+            }
+        }
+        function changeImage() {
+            const image = document.getElementById('image');
+            image.src = 'new-image.jpg';
+        }
+    </script>
+</body>
+</html>
