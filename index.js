@@ -1,106 +1,74 @@
 // 1
-const Button = {
-    width: 100,
-    height: 50,
-    text: "Click me",
-    showInfo: function() {
-        console.log(`Button: ${this.text}, Width: ${this.width}, Height: ${this.height}`);
-    }
-};
-
-const BootstrapButton = Object.create(Button);
-BootstrapButton.color = "blue";
-BootstrapButton.showInfo = function() {
-    Button.showInfo.call(this);
-    console.log(`Color: ${this.color}`);
-};
-
-console.log(Object.getPrototypeOf(BootstrapButton) === Button); // true
-
-BootstrapButton.showInfo();
-// 2
-const Shape = {
-    getName: function() {
-        return "Shape";
-    },
+const Car = {
+    brand: "Toyota",
+    model: "Corolla",
+    year: 2020,
     getInfo: function() {
-        console.log("Information about the shape.");
-    },
-    getArea: function() {
-        return null;
-    },
-    getPerimeter: function() {
-        return null;
+        return `${this.brand} ${this.model} (${this.year})`;
     }
 };
-
-const Square = Object.create(Shape);
-Square.sideLength = 5;
-Square.getName = function() {
-    return "Square";
+const ElectricCar = Object.create(Car);
+ElectricCar.batteryCapacity = "75 kWh";
+ElectricCar.getInfo = function() {
+    return `${Car.getInfo.call(this)}, Battery: ${this.batteryCapacity}`;
 };
-Square.getArea = function() {
-    return this.sideLength * this.sideLength;
+console.log(Object.getPrototypeOf(ElectricCar) === Car); 
+console.log(ElectricCar.getInfo());
+// 2
+const Book = {
+    title: "1984",
+    author: "George Orwell",
+    year: 1949,
+    getSummary: function() {
+        return `${this.title} by ${this.author}, published in ${this.year}`;
+    }
 };
-Square.getPerimeter = function() {
-    return 4 * this.sideLength;
+const Ebook = Object.create(Book);
+Ebook.fileSize = "2 MB";
+Ebook.getSummary = function() {
+    return `${Book.getSummary.call(this)}, File Size: ${this.fileSize}`;
 };
-
-const Rectangle = Object.create(Shape);
-Rectangle.width = 4;
-Rectangle.height = 6;
-Rectangle.getName = function() {
-    return "Rectangle";
-};
-Rectangle.getArea = function() {
-    return this.width * this.height;
-};
-Rectangle.getPerimeter = function() {
-    return 2 * (this.width + this.height);
-};
-
-const Triangle = Object.create(Shape);
-Triangle.side1 = 3;
-Triangle.side2 = 4;
-Triangle.side3 = 5;
-Triangle.getName = function() {
-    return "Triangle";
-};
-Triangle.getArea = function() {
-    const s = (this.side1 + this.side2 + this.side3) / 2;
-    return Math.sqrt(s * (s - this.side1) * (s - this.side2) * (s - this.side3));
-};
-Triangle.getPerimeter = function() {
-    return this.side1 + this.side2 + this.side3;
-};
-
-console.log(Object.getPrototypeOf(Square) === Shape); 
-console.log(Object.getPrototypeOf(Rectangle) === Shape); 
-console.log(Object.getPrototypeOf(Triangle) === Shape); 
-
-console.log(Square.getName(), Square.getArea(), Square.getPerimeter());
-console.log(Rectangle.getName(), Rectangle.getArea(), Rectangle.getPerimeter());
-console.log(Triangle.getName(), Triangle.getArea(), Triangle.getPerimeter());
+const library = [
+    Object.create(Book),
+    Object.create(Ebook)
+];
+library[0].title = "To Kill a Mockingbird";
+library[0].author = "Harper Lee";
+library[0].year = 1960;
+library[1].title = "Brave New World";
+library[1].author = "Aldous Huxley";
+library[1].year = 1932;
+library[1].fileSize = "1.5 MB";
+library.forEach(book => console.log(book.getSummary()));
 
 // 3
-const ExtendedArray = Object.create(Array.prototype);
-
-ExtendedArray.getString = function(separator = ",") {
-    return this.join(separator);
-};
-
-ExtendedArray.getHtml = function(tagName = "div") {
-    if (tagName === "li") {
-        return `<ul><li>${this.join(`</li><li>`)}</li></ul>`;
+const BankAccount = {
+    owner: "John Doe",
+    balance: 1000,
+    deposit: function(amount) {
+        this.balance += amount;
+    },
+    withdraw: function(amount) {
+        if (amount <= this.balance) {
+            this.balance -= amount;
+        } else {
+            console.log("Insufficient funds.");
+        }
     }
-    return this.map(item => `<${tagName}>${item}</${tagName}>`).join("");
 };
 
-const myArray = Object.create(ExtendedArray);
-Object.assign(myArray, ["item1", "item2", "item3"]);
+const SavingsAccount = Object.create(BankAccount);
+SavingsAccount.interestRate = 0.02;
+SavingsAccount.addInterest = function() {
+    this.balance += this.balance * this.interestRate;
+};
 
-console.log(Object.getPrototypeOf(myArray) === ExtendedArray); 
+console.log(Object.getPrototypeOf(SavingsAccount) === BankAccount); // true
 
-console.log(myArray.getString(" - "));
-console.log(myArray.getHtml("li"));
-console.log(myArray.getHtml("span"));
+SavingsAccount.deposit(500);
+SavingsAccount.addInterest();
+console.log(SavingsAccount.balance); 
+
+SavingsAccount.withdraw(200);
+console.log(SavingsAccount.balance); 
+
