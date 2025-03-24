@@ -1,81 +1,106 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Карти передбачень</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-        }
-        #predictionContainer {
-            text-align: center;
-            font-size: 1.2em;
-            opacity: 0;
-            transition: opacity 1s ease-in-out;
-        }
-        .positive {
-            color: green;
-        }
-        .neutral {
-            color: blue;
-        }
-        .mysterious {
-            color: purple;
-        }
-    </style>
-</head>
-<body>
-    <h1>🔮 Карти передбачень</h1>
-    <div id="predictionContainer">
-        <p id="predictionText"></p>
-        <p id="predictionDate"></p>
-    </div>
-    <button id="getPredictionButton">Отримати передбачення</button>
+// 1
+const Button = {
+    width: 100,
+    height: 50,
+    text: "Click me",
+    showInfo: function() {
+        console.log(`Button: ${this.text}, Width: ${this.width}, Height: ${this.height}`);
+    }
+};
 
-    <script>
-        const predictions = [
-            { text: "Сьогодні вас чекає успіх!", type: "positive" },
-            { text: "Будьте обережні з новими знайомими.", type: "neutral" },
-            { text: "Вас чекає несподівана зустріч.", type: "mysterious" },
-            { text: "День пройде спокійно, без несподіванок.", type: "neutral" },
-            { text: "Ваші мрії можуть здійснитися!", type: "positive" },
-            { text: "Сьогодні вирішуйте фінансові питання.", type: "neutral" },
-            { text: "Вас чекає приємна новина.", type: "positive" },
-            { text: "Будьте готові до змін.", type: "mysterious" },
-            { text: "День ідеально підходить для нових починань.", type: "positive" },
-            { text: "Сьогодні краще залишитися вдома.", type: "neutral" },
-            { text: "Ваша інтуїція вас не підведе.", type: "mysterious" },
-            { text: "День принесе багато радості.", type: "positive" },
-            { text: "Будьте уважні до дрібниць.", type: "neutral" },
-            { text: "Вас чекає цікава подорож.", type: "mysterious" },
-            { text: "Сьогодні ви зможете вирішити давню проблему.", type: "positive" }
-        ];
+const BootstrapButton = Object.create(Button);
+BootstrapButton.color = "blue";
+BootstrapButton.showInfo = function() {
+    Button.showInfo.call(this);
+    console.log(`Color: ${this.color}`);
+};
 
-        document.getElementById('getPredictionButton').addEventListener('click', () => {
-            const predictionContainer = document.getElementById('predictionContainer');
-            const predictionText = document.getElementById('predictionText');
-            const predictionDate = document.getElementById('predictionDate');
+console.log(Object.getPrototypeOf(BootstrapButton) === Button); // true
 
-            const randomPrediction = predictions[Math.floor(Math.random() * predictions.length)];
-            predictionText.textContent = randomPrediction.text;
-            predictionText.className = randomPrediction.type;
+BootstrapButton.showInfo();
+// 2
+const Shape = {
+    getName: function() {
+        return "Shape";
+    },
+    getInfo: function() {
+        console.log("Information about the shape.");
+    },
+    getArea: function() {
+        return null;
+    },
+    getPerimeter: function() {
+        return null;
+    }
+};
 
-            const currentDate = new Date();
-            predictionDate.textContent = `Сьогодні: ${currentDate.toLocaleDateString()}`;
+const Square = Object.create(Shape);
+Square.sideLength = 5;
+Square.getName = function() {
+    return "Square";
+};
+Square.getArea = function() {
+    return this.sideLength * this.sideLength;
+};
+Square.getPerimeter = function() {
+    return 4 * this.sideLength;
+};
 
-            predictionContainer.style.opacity = 0;
-            setTimeout(() => {
-                predictionContainer.style.opacity = 1;
-            }, 100);
-        });
-    </script>
-</body>
-</html>
+const Rectangle = Object.create(Shape);
+Rectangle.width = 4;
+Rectangle.height = 6;
+Rectangle.getName = function() {
+    return "Rectangle";
+};
+Rectangle.getArea = function() {
+    return this.width * this.height;
+};
+Rectangle.getPerimeter = function() {
+    return 2 * (this.width + this.height);
+};
+
+const Triangle = Object.create(Shape);
+Triangle.side1 = 3;
+Triangle.side2 = 4;
+Triangle.side3 = 5;
+Triangle.getName = function() {
+    return "Triangle";
+};
+Triangle.getArea = function() {
+    const s = (this.side1 + this.side2 + this.side3) / 2;
+    return Math.sqrt(s * (s - this.side1) * (s - this.side2) * (s - this.side3));
+};
+Triangle.getPerimeter = function() {
+    return this.side1 + this.side2 + this.side3;
+};
+
+console.log(Object.getPrototypeOf(Square) === Shape); 
+console.log(Object.getPrototypeOf(Rectangle) === Shape); 
+console.log(Object.getPrototypeOf(Triangle) === Shape); 
+
+console.log(Square.getName(), Square.getArea(), Square.getPerimeter());
+console.log(Rectangle.getName(), Rectangle.getArea(), Rectangle.getPerimeter());
+console.log(Triangle.getName(), Triangle.getArea(), Triangle.getPerimeter());
+
+// 3
+const ExtendedArray = Object.create(Array.prototype);
+
+ExtendedArray.getString = function(separator = ",") {
+    return this.join(separator);
+};
+
+ExtendedArray.getHtml = function(tagName = "div") {
+    if (tagName === "li") {
+        return `<ul><li>${this.join(`</li><li>`)}</li></ul>`;
+    }
+    return this.map(item => `<${tagName}>${item}</${tagName}>`).join("");
+};
+
+const myArray = Object.create(ExtendedArray);
+Object.assign(myArray, ["item1", "item2", "item3"]);
+
+console.log(Object.getPrototypeOf(myArray) === ExtendedArray); 
+
+console.log(myArray.getString(" - "));
+console.log(myArray.getHtml("li"));
+console.log(myArray.getHtml("span"));
