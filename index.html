@@ -3,171 +3,137 @@
 <html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <title>Трекбар</title>
+  <title>Введення імені</title>
 </head>
 <body>
 
-<h1>Трекбар</h1>
-<input type="range" min="0" max="100" value="50" id="slider" style="width:300px;">
-<p>Поточне значення: <span id="value">50</span></p>
+<h1>Введіть ваше ім'я</h1>
+<input type="text" id="username">
 
 <script>
-const slider = document.getElementById('slider');
-const value = document.getElementById('value');
+const input = document.getElementById('username');
 
-slider.addEventListener('input', () => {
-  value.textContent = slider.value;
+input.addEventListener('input', () => {
+  // Заміняємо всі цифри на порожній рядок
+  input.value = input.value.replace(/\d/g, '');
 });
 </script>
 
 </body>
 </html>
+
 //2
 <!DOCTYPE html>
 <html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <title>Галерея</title>
-</head>
-<body>
-
-<h1>Галерея</h1>
-<img id="galleryImage" src="" alt="Фото" width="400">
-<br><br>
-<button id="prevBtn">Назад</button>
-<button id="nextBtn">Вперед</button>
-
-<script>
-const images = [
-  'https://picsum.photos/id/237/400/300',
-  'https://picsum.photos/id/238/400/300',
-  'https://picsum.photos/id/239/400/300'
-];
-
-let currentIndex = 0;
-const galleryImage = document.getElementById('galleryImage');
-const prevBtn = document.getElementById('prevBtn');
-const nextBtn = document.getElementById('nextBtn');
-
-function updateGallery() {
-  galleryImage.src = images[currentIndex];
-  prevBtn.disabled = currentIndex === 0;
-  nextBtn.disabled = currentIndex === images.length - 1;
-}
-
-prevBtn.addEventListener('click', () => {
-  if (currentIndex > 0) {
-    currentIndex--;
-    updateGallery();
-  }
-});
-
-nextBtn.addEventListener('click', () => {
-  if (currentIndex < images.length - 1) {
-    currentIndex++;
-    updateGallery();
-  }
-});
-
-// Показати перше фото
-updateGallery();
-</script>
-
-</body>
-</html>
-//3
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-  <meta charset="UTF-8">
-  <title>Блоки інформації</title>
+  <title>Модальне вікно</title>
   <style>
-    .content {
+    .modal {
       display: none;
-      margin-bottom: 10px;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
     }
-    .active .content {
-      display: block;
-    }
-    h2 {
-      cursor: pointer;
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 5px;
     }
   </style>
 </head>
 <body>
 
-<h1>Інформаційні блоки</h1>
+<button id="openModalBtn">Відкрити</button>
 
-<div class="block">
-  <h2>Блок 1</h2>
-  <div class="content">Текст блоку 1</div>
-</div>
-<div class="block">
-  <h2>Блок 2</h2>
-  <div class="content">Текст блоку 2</div>
-</div>
-<div class="block">
-  <h2>Блок 3</h2>
-  <div class="content">Текст блоку 3</div>
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <p>Це модальне вікно</p>
+    <button id="closeModalBtn">Закрити</button>
+  </div>
 </div>
 
 <script>
-const blocks = document.querySelectorAll('.block');
+const openModalBtn = document.getElementById('openModalBtn');
+const closeModalBtn = document.getElementById('closeModalBtn');
+const modal = document.getElementById('modal');
 
-blocks.forEach(block => {
-  block.querySelector('h2').addEventListener('click', () => {
-    blocks.forEach(b => b.classList.remove('active'));
-    block.classList.add('active');
-  });
+openModalBtn.addEventListener('click', () => {
+  modal.style.display = 'flex';
+});
+
+closeModalBtn.addEventListener('click', () => {
+  modal.style.display = 'none';
 });
 </script>
 
 </body>
 </html>
 
-//4
+//3
 <!DOCTYPE html>
 <html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <title>Новини</title>
+  <title>Футбольне поле</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+    #field {
+      width: 100%;
+      height: 100%;
+      background: green;
+      position: relative;
+    }
+    #ball {
+      width: 100px;
+      height: 100px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: url('https://upload.wikimedia.org/wikipedia/commons/6/6e/Soccer_ball.svg') no-repeat center;
+      background-size: cover;
+      transition: all 0.5s ease;
+    }
+  </style>
 </head>
 <body>
 
-<h1>Список новин</h1>
-<ul id="newsList"></ul>
-<button id="loadMoreBtn">Завантажити ще</button>
+<div id="field">
+  <div id="ball"></div>
+</div>
 
 <script>
-const news = [
-  "Новина 1: Щось важливе сталося",
-  "Новина 2: Інша подія",
-  "Новина 3: Ще одна новина",
-  "Новина 4: Більше новин",
-  "Новина 5: Остання на сьогодні"
-];
+const field = document.getElementById('field');
+const ball = document.getElementById('ball');
 
-let currentNewsIndex = 0;
-const newsList = document.getElementById('newsList');
-const loadMoreBtn = document.getElementById('loadMoreBtn');
+field.addEventListener('click', function(event) {
+  const fieldRect = field.getBoundingClientRect();
+  let x = event.clientX - fieldRect.left;
+  let y = event.clientY - fieldRect.top;
 
-function loadNews() {
-  if (currentNewsIndex < news.length) {
-    const li = document.createElement('li');
-    li.textContent = news[currentNewsIndex];
-    newsList.appendChild(li);
-    currentNewsIndex++;
-  }
-  
-  if (currentNewsIndex >= news.length) {
-    loadMoreBtn.disabled = true;
-    loadMoreBtn.textContent = "Більше новин немає";
-  }
-}
+  // Зміщення центру м'яча
+  x -= ball.offsetWidth / 2;
+  y -= ball.offsetHeight / 2;
 
-loadMoreBtn.addEventListener('click', loadNews);
+  // Обмеження, щоб м'яч не виходив за межі поля
+  const maxX = field.clientWidth - ball.offsetWidth;
+  const maxY = field.clientHeight - ball.offsetHeight;
 
-loadNews();
+  x = Math.max(0, Math.min(x, maxX));
+  y = Math.max(0, Math.min(y, maxY));
+
+  ball.style.left = `${x}px`;
+  ball.style.top = `${y}px`;
+});
 </script>
 
 </body>
