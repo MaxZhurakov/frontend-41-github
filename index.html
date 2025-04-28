@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Форма реєстрації</title>
+    <style>
+        .error { color: red; font-size: 0.8em; }
+    </style>
+</head>
+<body>
+
+<form id="registrationForm">
+    <input type="text" id="username" placeholder="Ім'я користувача" required><div id="usernameError" class="error"></div>
+    <input type="email" id="email" placeholder="Email" required><div id="emailError" class="error"></div>
+    <input type="password" id="password" placeholder="Пароль" required><div id="passwordError" class="error"></div>
+    <input type="tel" id="phone" placeholder="Телефон (+380...)" required><div id="phoneError" class="error"></div>
+    <input type="date" id="dob" placeholder="Дата народження" required><div id="dobError" class="error"></div>
+    <input type="url" id="website" placeholder="URL сайту (не обов'язково)"><div id="websiteError" class="error"></div>
+    <button type="submit">Зареєструватися</button>
+</form>
+
+<script>
+document.getElementById('registrationForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    document.querySelectorAll('.error').forEach(el => el.textContent = '');
+
+    let isValid = true;
+    const username = document.getElementById('username').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const phone = document.getElementById('phone').value.trim();
+    const dob = document.getElementById('dob').value;
+    const website = document.getElementById('website').value.trim();
+
+    if (!/^[a-zA-Z0-9]{3,}$/.test(username)) {
+        document.getElementById('usernameError').textContent = "Ім'я має мінімум 3 символи, тільки літери і цифри.";
+        isValid = false;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        document.getElementById('emailError').textContent = "Некоректний email.";
+        isValid = false;
+    }
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(password)) {
+        document.getElementById('passwordError').textContent = "Пароль має містити велику, малу літери і цифру.";
+        isValid = false;
+    }
+    if (!/^\+380\d{9}$/.test(phone)) {
+        document.getElementById('phoneError').textContent = "Формат телефону: +380xxxxxxxxx.";
+        isValid = false;
+    }
+    if (dob) {
+        const birthDate = new Date(dob);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        if (today.getMonth() < birthDate.getMonth() || 
+           (today.getMonth() == birthDate.getMonth() && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        if (age < 18) {
+            document.getElementById('dobError').textContent = "Вам має бути мінімум 18 років.";
+            isValid = false;
+        }
+    } else {
+        document.getElementById('dobError').textContent = "Оберіть дату народження.";
+        isValid = false;
+    }
+    if (website && !/^(https?:\/\/)?([\w\-]+\.)+[\w]{2,}(\/[\w\-./?%&=]*)?$/.test(website)) {
+        document.getElementById('websiteError').textContent = "Некоректний URL.";
+        isValid = false;
+    }
+
+    if (isValid) {
+        console.log({
+            username, email, password, phone, dob, website
+        });
+        alert("Реєстрація успішна! Дані виведені в консоль.");
+    }
+});
+</script>
+
+</body>
+</html>
