@@ -2,79 +2,153 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Форма реєстрації</title>
+    <title>Star Wars Characters</title>
     <style>
-        .error { color: red; font-size: 0.8em; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f0f0f0;
+        }
+        #filter {
+            margin-bottom: 20px;
+            padding: 10px;
+            width: 100%;
+            max-width: 400px;
+            font-size: 16px;
+        }
+        .characters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 200px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: scale(1.05);
+        }
+        .card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+        .card h3 {
+            margin: 10px;
+            font-size: 18px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 10px;
+            position: relative;
+        }
+        .modal-content img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        .close {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            font-size: 24px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
-<form id="registrationForm">
-    <input type="text" id="username" placeholder="Ім'я користувача" required><div id="usernameError" class="error"></div>
-    <input type="email" id="email" placeholder="Email" required><div id="emailError" class="error"></div>
-    <input type="password" id="password" placeholder="Пароль" required><div id="passwordError" class="error"></div>
-    <input type="tel" id="phone" placeholder="Телефон (+380...)" required><div id="phoneError" class="error"></div>
-    <input type="date" id="dob" placeholder="Дата народження" required><div id="dobError" class="error"></div>
-    <input type="url" id="website" placeholder="URL сайту (не обов'язково)"><div id="websiteError" class="error"></div>
-    <button type="submit">Зареєструватися</button>
-</form>
+<h1>Персонажі Star Wars</h1>
+
+<input type="text" id="filter" placeholder="Пошук за ім'ям чи властивістю...">
+
+<div class="characters" id="charactersContainer"></div>
+
+<div class="modal" id="modal">
+    <div class="modal-content" id="modalContent">
+        <span class="close" id="closeModal">&times;</span>
+    </div>
+</div>
 
 <script>
-document.getElementById('registrationForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    document.querySelectorAll('.error').forEach(el => el.textContent = '');
+const charactersContainer = document.getElementById('charactersContainer');
+const filterInput = document.getElementById('filter');
+const modal = document.getElementById('modal');
+const modalContent = document.getElementById('modalContent');
+const closeModal = document.getElementById('closeModal');
 
-    let isValid = true;
-    const username = document.getElementById('username').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    const phone = document.getElementById('phone').value.trim();
-    const dob = document.getElementById('dob').value;
-    const website = document.getElementById('website').value.trim();
+let characters = []; 
 
-    if (!/^[a-zA-Z0-9]{3,}$/.test(username)) {
-        document.getElementById('usernameError').textContent = "Ім'я має мінімум 3 символи, тільки літери і цифри.";
-        isValid = false;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        document.getElementById('emailError').textContent = "Некоректний email.";
-        isValid = false;
-    }
-    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(password)) {
-        document.getElementById('passwordError').textContent = "Пароль має містити велику, малу літери і цифру.";
-        isValid = false;
-    }
-    if (!/^\+380\d{9}$/.test(phone)) {
-        document.getElementById('phoneError').textContent = "Формат телефону: +380xxxxxxxxx.";
-        isValid = false;
-    }
-    if (dob) {
-        const birthDate = new Date(dob);
-        const today = new Date();
-        let age = today.getFullYear() - birthDate.getFullYear();
-        if (today.getMonth() < birthDate.getMonth() || 
-           (today.getMonth() == birthDate.getMonth() && today.getDate() < birthDate.getDate())) {
-            age--;
-        }
-        if (age < 18) {
-            document.getElementById('dobError').textContent = "Вам має бути мінімум 18 років.";
-            isValid = false;
-        }
-    } else {
-        document.getElementById('dobError').textContent = "Оберіть дату народження.";
-        isValid = false;
-    }
-    if (website && !/^(https?:\/\/)?([\w\-]+\.)+[\w]{2,}(\/[\w\-./?%&=]*)?$/.test(website)) {
-        document.getElementById('websiteError').textContent = "Некоректний URL.";
-        isValid = false;
-    }
+fetch('https://akabab.github.io/starwars-api/api/all.json')
+    .then(response => response.json())
+    .then(data => {
+        characters = data;
+        renderCharacters(characters);
+    })
+    .catch(error => console.error('Помилка завантаження:', error));
 
-    if (isValid) {
-        console.log({
-            username, email, password, phone, dob, website
-        });
-        alert("Реєстрація успішна! Дані виведені в консоль.");
+function renderCharacters(list) {
+    charactersContainer.innerHTML = '';
+    list.forEach(character => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+            <img src="${character.image}" alt="${character.name}">
+            <h3>${character.name}</h3>
+        `;
+        card.addEventListener('click', () => showModal(character));
+        charactersContainer.appendChild(card);
+    });
+}
+
+function showModal(character) {
+    modalContent.innerHTML = `
+        <span class="close" id="closeModal">&times;</span>
+        <img src="${character.image}" alt="${character.name}">
+        <h2>${character.name}</h2>
+        <p><strong>Species:</strong> ${character.species || 'Невідомо'}</p>
+        <p><strong>Gender:</strong> ${character.gender || 'Невідомо'}</p>
+        <p><strong>Height:</strong> ${character.height || 'Невідомо'} см</p>
+        <p><strong>Homeworld:</strong> ${character.homeworld || 'Невідомо'}</p>
+    `;
+    modal.style.display = 'flex';
+
+    document.getElementById('closeModal').onclick = () => {
+        modal.style.display = 'none';
+    };
+}
+
+modal.onclick = function(event) {
+    if (event.target === modal) {
+        modal.style.display = 'none';
     }
+}
+filterInput.addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const filtered = characters.filter(character => {
+        return Object.values(character).some(value => 
+            String(value).toLowerCase().includes(searchTerm)
+        );
+    });
+    renderCharacters(filtered);
 });
 </script>
 
