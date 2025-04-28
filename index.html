@@ -1,36 +1,174 @@
-class UserManager 
-{
-    constructor() 
-    {
-        this.users = []; 
-    }
+//1 
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Трекбар</title>
+</head>
+<body>
 
-    addUser(user)
-    {
-        this.users.push(user); 
-    }
+<h1>Трекбар</h1>
+<input type="range" min="0" max="100" value="50" id="slider" style="width:300px;">
+<p>Поточне значення: <span id="value">50</span></p>
 
-    removeUser(name) 
-    {
-        this.users = this.users.filter(user => user.name !== name);
-    }
+<script>
+const slider = document.getElementById('slider');
+const value = document.getElementById('value');
 
-    listUsers() 
-    {
-        return this.users;
-    }
+slider.addEventListener('input', () => {
+  value.textContent = slider.value;
+});
+</script>
+
+</body>
+</html>
+//2
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Галерея</title>
+</head>
+<body>
+
+<h1>Галерея</h1>
+<img id="galleryImage" src="" alt="Фото" width="400">
+<br><br>
+<button id="prevBtn">Назад</button>
+<button id="nextBtn">Вперед</button>
+
+<script>
+const images = [
+  'https://picsum.photos/id/237/400/300',
+  'https://picsum.photos/id/238/400/300',
+  'https://picsum.photos/id/239/400/300'
+];
+
+let currentIndex = 0;
+const galleryImage = document.getElementById('galleryImage');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+
+function updateGallery() {
+  galleryImage.src = images[currentIndex];
+  prevBtn.disabled = currentIndex === 0;
+  nextBtn.disabled = currentIndex === images.length - 1;
 }
 
-const manager = new UserManager();
+prevBtn.addEventListener('click', () => {
+  if (currentIndex > 0) {
+    currentIndex--;
+    updateGallery();
+  }
+});
 
-const user = { name: "John Doe", role: "user" };
-const admin = { name: "Jane Smith", role: "admin" };
+nextBtn.addEventListener('click', () => {
+  if (currentIndex < images.length - 1) {
+    currentIndex++;
+    updateGallery();
+  }
+});
 
-manager.addUser(user);
-manager.addUser(admin);
+// Показати перше фото
+updateGallery();
+</script>
 
-console.log(manager.listUsers()); 
+</body>
+</html>
+//3
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Блоки інформації</title>
+  <style>
+    .content {
+      display: none;
+      margin-bottom: 10px;
+    }
+    .active .content {
+      display: block;
+    }
+    h2 {
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
 
-manager.removeUser("John Doe");
+<h1>Інформаційні блоки</h1>
 
-console.log(manager.listUsers()); 
+<div class="block">
+  <h2>Блок 1</h2>
+  <div class="content">Текст блоку 1</div>
+</div>
+<div class="block">
+  <h2>Блок 2</h2>
+  <div class="content">Текст блоку 2</div>
+</div>
+<div class="block">
+  <h2>Блок 3</h2>
+  <div class="content">Текст блоку 3</div>
+</div>
+
+<script>
+const blocks = document.querySelectorAll('.block');
+
+blocks.forEach(block => {
+  block.querySelector('h2').addEventListener('click', () => {
+    blocks.forEach(b => b.classList.remove('active'));
+    block.classList.add('active');
+  });
+});
+</script>
+
+</body>
+</html>
+
+//4
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Новини</title>
+</head>
+<body>
+
+<h1>Список новин</h1>
+<ul id="newsList"></ul>
+<button id="loadMoreBtn">Завантажити ще</button>
+
+<script>
+const news = [
+  "Новина 1: Щось важливе сталося",
+  "Новина 2: Інша подія",
+  "Новина 3: Ще одна новина",
+  "Новина 4: Більше новин",
+  "Новина 5: Остання на сьогодні"
+];
+
+let currentNewsIndex = 0;
+const newsList = document.getElementById('newsList');
+const loadMoreBtn = document.getElementById('loadMoreBtn');
+
+function loadNews() {
+  if (currentNewsIndex < news.length) {
+    const li = document.createElement('li');
+    li.textContent = news[currentNewsIndex];
+    newsList.appendChild(li);
+    currentNewsIndex++;
+  }
+  
+  if (currentNewsIndex >= news.length) {
+    loadMoreBtn.disabled = true;
+    loadMoreBtn.textContent = "Більше новин немає";
+  }
+}
+
+loadMoreBtn.addEventListener('click', loadNews);
+
+loadNews();
+</script>
+
+</body>
+</html>
