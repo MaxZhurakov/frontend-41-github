@@ -1,138 +1,158 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="ua">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Форма реєстрації</title>
+  <title>Домашня практика</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    label {
-      display: block;
-      margin: 10px 0 5px;
-    }
-    input, select {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 10px;
-    }
-    .hidden {
-      display: none;
-    }
-    .error {
-      color: red;
-      margin-top: -8px;
-      margin-bottom: 10px;
-    }
+    body { font-family: Arial; padding: 20px; }
+    label, button { margin: 10px 0; display: block; }
+    video, audio { margin-top: 10px; max-width: 100%; }
+    .lang-switch { margin-top: 20px; }
   </style>
 </head>
 <body>
-  <h2>Форма реєстрації</h2>
-  <form id="registrationForm">
-    <label>ПІБ:
-      <input type="text" id="fullName" required />
+
+  <h2 id="title">Реєстрація</h2>
+
+  <div class="lang-switch">
+    <label>Мова: 
+      <select id="langSelect">
+        <option value="ua">Українська</option>
+        <option value="en">English</option>
+      </select>
     </label>
+  </div>
 
-    <label>Email:
-      <input type="email" id="email" required />
+  <form id="loginForm">
+    <label id="loginLabel">Логін: 
+      <input type="text" id="loginInput" required />
     </label>
-
-    <label>Телефон:
-      <input type="tel" id="phone" required />
-    </label>
-
-    <label>Захід:
-      <input type="text" id="event" required />
-    </label>
-
-    <label>Дата народження:
-      <input type="date" id="birthdate" required />
-    </label>
-    <div id="ageError" class="error hidden">Вам має бути не менше 18 років.</div>
-
-    <label>Посада/Роль:
-      <input type="text" id="role" required />
-    </label>
-
-    <label>Чи відвідували ви раніше наші заходи?</label>
-    <label><input type="radio" name="visited" value="yes" /> Так</label>
-    <label><input type="radio" name="visited" value="no" /> Ні</label>
-
-    <div id="previousEventBlock" class="hidden">
-      <label>Назвіть захід, який ви відвідували:
-        <input type="text" id="previousEvent" />
-      </label>
-      <div id="eventError" class="error hidden">Це поле обов'язкове.</div>
-    </div>
-
-    <button type="submit">Надіслати</button>
+    <button type="submit" id="submitBtn">Зберегти логін</button>
   </form>
 
+  <p><strong>Збережено в cookie:</strong> <span id="savedLogin">—</span></p>
+  <button onclick="clearAll()">Очистити всі дані</button>
+
+  <hr />
+
+  <button id="cameraBtn">Увімкнути камеру</button>
+  <video id="video" autoplay playsinline></video>
+
+  <hr />
+
+  <button onclick="document.getElementById('audio').play()">▶️ Відтворити аудіо</button>
+  <audio id="audio" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" controls></audio>
+
+  <hr />
+
+  <button id="recordBtn">Почати запис</button>
+  <video id="recordedVideo" controls></video>
+
   <script>
-    const form = document.getElementById("registrationForm");
-    const birthdate = document.getElementById("birthdate");
-    const ageError = document.getElementById("ageError");
-    const visitedRadios = document.getElementsByName("visited");
-    const previousEventBlock = document.getElementById("previousEventBlock");
-    const previousEventInput = document.getElementById("previousEvent");
-    const eventError = document.getElementById("eventError");
+    const langSelect = document.getElementById("langSelect");
+    const title = document.getElementById("title");
+    const loginLabel = document.getElementById("loginLabel");
+    const submitBtn = document.getElementById("submitBtn");
 
-    visitedRadios.forEach(radio => {
-      radio.addEventListener("change", () => {
-        if (radio.value === "yes") {
-          previousEventBlock.classList.remove("hidden");
-        } else {
-          previousEventBlock.classList.add("hidden");
-          previousEventInput.value = "";
-        }
-      });
-    });
+    const langText = {
+      ua: {
+        title: "Реєстрація",
+        login: "Логін:",
+        button: "Зберегти логін"
+      },
+      en: {
+        title: "Registration",
+        login: "Login:",
+        button: "Save login"
+      }
+    };
 
-    function isAdult(birthdate) {
-      const today = new Date();
-      const birth = new Date(birthdate);
-      const age = today.getFullYear() - birth.getFullYear();
-      const m = today.getMonth() - birth.getMonth();
-      return age > 18 || (age === 18 && m >= 0 && today.getDate() >= birth.getDate());
+    function setLanguage(lang) {
+      localStorage.setItem("lang", lang);
+      title.textContent = langText[lang].title;
+      loginLabel.innerHTML = `${langText[lang].login} <input type="text" id="loginInput" required />`;
+      submitBtn.textContent = langText[lang].button;
     }
 
-    form.addEventListener("submit", (e) => {
+    langSelect.addEventListener("change", (e) => {
+      setLanguage(e.target.value);
+    });
+
+    // Завантаження мови при старті
+    const savedLang = localStorage.getItem("lang") || "ua";
+    langSelect.value = savedLang;
+    setLanguage(savedLang);
+
+    // Реєстрація з cookie
+    const loginForm = document.getElementById("loginForm");
+    const savedLogin = document.getElementById("savedLogin");
+
+    function setCookie(name, value, days = 365) {
+      const d = new Date();
+      d.setTime(d.getTime() + days * 24 * 60 * 60 * 1000);
+      document.cookie = `${name}=${value};expires=${d.toUTCString()};path=/`;
+    }
+
+    function getCookie(name) {
+      const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
+      return match ? match[2] : null;
+    }
+
+    loginForm.addEventListener("submit", (e) => {
       e.preventDefault();
+      const loginValue = document.getElementById("loginInput").value;
+      setCookie("login", loginValue);
+      savedLogin.textContent = loginValue;
+    });
 
-      ageError.classList.add("hidden");
-      eventError.classList.add("hidden");
+    savedLogin.textContent = getCookie("login") || "—";
 
-      const selectedVisited = Array.from(visitedRadios).find(r => r.checked)?.value || "";
-      const isVisited = selectedVisited === "yes";
+    // Очистити всі дані
+    function clearAll() {
+      localStorage.clear();
+      document.cookie.split(";").forEach(c => {
+        document.cookie = c.trim().split("=")[0] + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/";
+      });
+      alert("Всі дані очищено!");
+      location.reload();
+    }
 
-      if (!isAdult(birthdate.value)) {
-        ageError.classList.remove("hidden");
-        return;
-      }
+    // Камера
+    const cameraBtn = document.getElementById("cameraBtn");
+    const video = document.getElementById("video");
 
-      if (isVisited && previousEventInput.value.trim() === "") {
-        eventError.classList.remove("hidden");
-        return;
-      }
+    cameraBtn.onclick = async () => {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      video.srcObject = stream;
 
-      const data = {
-        fullName: document.getElementById("fullName").value.trim(),
-        email: document.getElementById("email").value.trim(),
-        phone: document.getElementById("phone").value.trim(),
-        event: document.getElementById("event").value.trim(),
-        birthdate: birthdate.value,
-        role: document.getElementById("role").value.trim(),
-        visitedBefore: selectedVisited,
-        previousEvent: isVisited ? previousEventInput.value.trim() : ""
+      setTimeout(() => {
+        stream.getTracks().forEach(track => track.stop());
+      }, 3000);
+    };
+
+    // Запис відео
+    const recordBtn = document.getElementById("recordBtn");
+    const recordedVideo = document.getElementById("recordedVideo");
+    let mediaRecorder, chunks = [];
+
+    recordBtn.onclick = async () => {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      mediaRecorder = new MediaRecorder(stream);
+      chunks = [];
+
+      mediaRecorder.ondataavailable = e => chunks.push(e.data);
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(chunks, { type: "video/webm" });
+        recordedVideo.src = URL.createObjectURL(blob);
       };
 
-      console.log(data);
-      alert("Дані успішно надіслані! Перевірте консоль.");
-      form.reset();
-      previousEventBlock.classList.add("hidden");
-    });
+      mediaRecorder.start();
+
+      setTimeout(() => {
+        mediaRecorder.stop();
+        stream.getTracks().forEach(track => track.stop());
+      }, 5000);
+    };
   </script>
 </body>
 </html>
