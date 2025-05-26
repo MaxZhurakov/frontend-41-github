@@ -1,102 +1,147 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8" />
-  <title>Пости з пагінацією</title>
+  <meta charset="UTF-8">
+  <title>CRUD Пости</title>
   <style>
-    body { font-family: Arial; padding: 20px; max-width: 600px; margin: auto; }
-    .post { border-bottom: 1px solid #ccc; padding: 10px 0; }
-    .pagination { margin-top: 20px; }
-    .pagination button { margin-right: 5px; }
-    input[type="text"] { width: 100%; padding: 8px; margin-bottom: 20px; }
+    body { font-family: Arial; padding: 20px; max-width: 800px; margin: auto; }
+    input, textarea, button { display: block; margin: 10px 0; padding: 8px; width: 100%; }
+    .post { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+    .actions button { margin-right: 10px; }
+    #loading { color: green; margin-bottom: 10px; }
+    .error { color: red; }
   </style>
 </head>
 <body>
 
-  <h2>Список постів</h2>
-  <input type="text" id="searchInput" placeholder="Пошук за заголовком..." />
+  <h2>Створити новий пост</h2>
+  <div id="errorMsg" class="error"></div>
+  <form id="postForm">
+    <input type="text" id="title" placeholder="Заголовок" required>
+    <textarea id="body" placeholder="Опис" required></textarea>
+    <button type="submit">Створити пост</button>
+  </form>
 
+  <h2>Список постів</h2>
+  <div id="loading">Завантаження...</div>
   <div id="posts"></div>
-  <div class="pagination">
-    <button onclick="prevPage()">⬅️ Попередня</button>
-    <span id="pageNum">Сторінка: 1</span>
-    <button onclick="nextPage()">Наступна ➡️</button>
-  </div>
 
   <script>
-    let currentPage = 1;
-    const limit = 10;
-    let searchTerm = "";
-    let controller = null;
+    const postForm = document.getElementById('postForm');
+    const titleInput = document.getElementById('title');
+    const bodyInput = document.getElementById('body');
+    const postsDiv = document.getElementById('posts');
+    const loading = document.getElementById('loading');
+    const errorMsg = document.getElementById('errorMsg');
 
-    const postsDiv = document.getElementById("posts");
-    const pageNum = document.getElementById("pageNum");
-    const searchInput = document.getElementById("searchInput");
-
-    async function fetchPosts(page = 1, search = "") {
-      if (controller) controller.abort(); // Скасування попереднього запиту
-
-      controller = new AbortController();
-      const signal = controller.signal;
-
-      const url = `https://jsonplaceholder.typicode.com/posts?_page=${page}&_limit=${limit}`;
-      
+    async function loadPosts() {
+      loading.style.display = 'block';
+      postsDiv.innerHTML = '';
       try {
-        const res = await fetch(url, { signal });
-        const posts = await res.json();
-
-        const filtered = search
-          ? posts.filter(p => p.title.toLowerCase().includes(search.toLowerCase()))
-          : posts;
-
-        renderPosts(filtered);
-        pageNum.textContent = `Сторінка: ${page}`;
-      } catch (err) {
-        if (err.name === "AbortError") {
-          console.log("Запит скасовано");
-        } else {
-          console.error("Помилка завантаження:", err);
-        }
+        const res = await fetch('https://jsonplaceholder.typicode.com/posts?_limit=10');
+        const data = await res.json();
+        data.forEach(renderPost);
+      } catch (error) {
+        showError("Помилка завантаження постів.");
+      } finally {
+        loading.style.display = 'none';
       }
     }
 
-    function renderPosts(posts) {
-      postsDiv.innerHTML = posts.length
-        ? posts.map(p => `<div class="post"><strong>${p.title}</strong><p>${p.body}</p></div>`).join("")
-        : "<p>Нічого не знайдено.</p>";
+    postForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const title = titleInput.value.trim();
+      const body = bodyInput.value.trim();
+
+      if (!title || !body) return;
+
+      try {
+        const res = await fetch('https://jsonplaceholder.typicode.com/posts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, body }),
+        });
+        const newPost = await res.json();
+        renderPost(newPost, true);
+        postForm.reset();
+      } catch (error) {
+        showError("Не вдалося створити пост.");
+      }
+    });
+
+    function renderPost(post, prepend = false) {
+      const div = document.createElement('div');
+      div.className = 'post';
+      div.dataset.id = post.id;
+
+      div.innerHTML = `
+        <h3>${post.title}</h3>
+        <p>${post.body}</p>
+        <div class="actions">
+          <button onclick="editPost(${post.id})">Редагувати</button>
+          <button onclick="deletePost(${post.id})">Видалити</button>
+        </div>
+      `;
+
+      prepend ? postsDiv.prepend(div) : postsDiv.appendChild(div);
     }
 
-    function nextPage() {
-      currentPage++;
-      fetchPosts(currentPage, searchTerm);
-    }
-
-    function prevPage() {
-      if (currentPage > 1) {
-        currentPage--;
-        fetchPosts(currentPage, searchTerm);
+    async function deletePost(id) {
+      try {
+        await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
+          method: 'DELETE'
+        });
+        document.querySelector(`.post[data-id="${id}"]`).remove();
+      } catch {
+        showError("Не вдалося видалити пост.");
       }
     }
 
-    // Дебаунс функція
-    function debounce(fn, delay) {
-      let timer;
-      return function(...args) {
-        clearTimeout(timer);
-        timer = setTimeout(() => fn.apply(this, args), delay);
-      };
+    async function editPost(id) {
+      const postDiv = document.querySelector(`.post[data-id="${id}"]`);
+      const currentTitle = postDiv.querySelector('h3').textContent;
+      const currentBody = postDiv.querySelector('p').textContent;
+
+      postDiv.innerHTML = `
+        <input type="text" id="editTitle${id}" value="${currentTitle}">
+        <textarea id="editBody${id}">${currentBody}</textarea>
+        <button onclick="updatePost(${id})">Оновити</button>
+        <button onclick="loadPosts()">Скасувати</button>
+      `;
     }
 
-    const onSearch = debounce((e) => {
-      searchTerm = e.target.value;
-      currentPage = 1;
-      fetchPosts(currentPage, searchTerm);
-    }, 500);
+    async function updatePost(id) {
+      const newTitle = document.getElementById(`editTitle${id}`).value.trim();
+      const newBody = document.getElementById(`editBody${id}`).value.trim();
 
-    searchInput.addEventListener("input", onSearch);
+      try {
+        const res = await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: newTitle, body: newBody })
+        });
 
-    // Початкове завантаження
-    fetchPosts();
+        const updatedPost = await res.json();
+        document.querySelector(`.post[data-id="${id}"]`).innerHTML = `
+          <h3>${updatedPost.title}</h3>
+          <p>${updatedPost.body}</p>
+          <div class="actions">
+            <button onclick="editPost(${id})">Редагувати</button>
+            <button onclick="deletePost(${id})">Видалити</button>
+          </div>
+        `;
+      } catch {
+        showError("Не вдалося оновити пост.");
+      }
+    }
+
+    function showError(message) {
+      errorMsg.textContent = message;
+      setTimeout(() => errorMsg.textContent = '', 4000);
+    }
+
+    loadPosts();
   </script>
+
 </body>
 </html>
