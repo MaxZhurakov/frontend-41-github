@@ -1,141 +1,90 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-  <meta charset="UTF-8" />
-  <title>Форма з валідацією</title>
-  <style>
-    form { max-width: 400px; margin: 20px auto; padding: 20px; border: 1px solid #ccc; }
-    .error { color: red; margin: 5px 0; font-size: 0.9em; }
-    .result { border-top: 1px solid #ccc; padding-top: 20px; margin-top: 20px; }
-  </style>
-</head>
-<body>
-
-  <form id="user-form">
-    <label>Ім’я користувача: <input name="username" /></label><br><br>
-    <label>Рік народження: <input name="birthYear" type="number" /></label><br><br>
-    <label>Колір очей: 
-      <select name="eyeColor">
-        <option value="">Оберіть</option>
-        <option>brown</option><option>green</option><option>gray</option><option>blue</option>
-      </select>
-    </label><br><br>
-    <label>Колір волосся:
-      <select name="hairColor">
-        <option value="">Оберіть</option>
-        <option>black</option><option>brown</option><option>white</option><option>red</option><option>other</option>
-      </select>
-    </label><br><br>
-    <label>Зріст (м): <input name="height" type="number" step="0.01" /></label><br><br>
-    <label>Вага (кг): <input name="weight" type="number" /></label><br><br>
-    <button type="submit">Надіслати</button>
-    <div id="errors" class="error"></div>
-  </form>
-
-  <div id="result" class="result"></div>
-
-<script>
-class Rule {
-  constructor(name, errorText, validateFn) {
-    this.name = name;
-    this.errorText = errorText;
-    this.validateFn = validateFn;
+// Factory + Observer
+class News {
+  constructor(title, content) {
+    this.title = title;
+    this.content = content;
   }
-  isValid(value) {
-    return this.validateFn(value);
+  getInfo() {
+    return `[Новина] ${this.title}: ${this.content}`;
   }
 }
 
-class ConsoleLogger {
-  log(msg) {
-    console.error("ConsoleLogger:", msg);
+class SportsNews extends News {
+  getInfo() {
+    return `[⚽ Спорт] ${this.title}: ${this.content}`;
   }
 }
 
-class AlertLogger {
-  log(msg) {
-    alert("AlertLogger: " + msg);
+class PoliticsNews extends News {
+  getInfo() {
+    return `[🏛️ Політика] ${this.title}: ${this.content}`;
   }
 }
 
-class DomLogger {
-  constructor(containerId) {
-    this.container = document.getElementById(containerId);
-  }
-  log(msg) {
-    const p = document.createElement("p");
-    p.textContent = msg;
-    this.container.appendChild(p);
-  }
-  clear() {
-    this.container.innerHTML = "";
+class EntertainmentNews extends News {
+  getInfo() {
+    return `[🎬 Розваги] ${this.title}: ${this.content}`;
   }
 }
 
-class Validator {
-  constructor(logger, rules = []) {
-    this.logger = logger;
-    this.rules = rules;
-  }
-
-  validate(form) {
-    let isValid = true;
-    if (this.logger.clear) this.logger.clear();
-
-    for (let rule of this.rules) {
-      const el = form.elements[rule.name];
-      const value = el.value.trim();
-      if (!rule.isValid(value)) {
-        this.logger.log(`${rule.name}: ${rule.errorText}`);
-        isValid = false;
-      }
+// Factory Method
+class NewsFactory {
+  static create(type, title, content) {
+    switch (type) {
+      case 'sport': return new SportsNews(title, content);
+      case 'politics': return new PoliticsNews(title, content);
+      case 'entertainment': return new EntertainmentNews(title, content);
+      default: return new News(title, content);
     }
-
-    return isValid;
   }
 }
 
-class Processor {
-  constructor(validator, success) {
-    this.validator = validator;
-    this.success = success;
+// Observer
+class NewsAgency {
+  constructor() {
+    this.subscribers = [];
   }
-
-  attach(formSelector) {
-    const form = document.querySelector(formSelector);
-    form.onsubmit = (e) => {
-      e.preventDefault();
-      if (this.validator.validate(form)) {
-        const data = {};
-        for (let el of form.elements) {
-          if (el.name) data[el.name] = el.value.trim();
-        }
-        this.success(data, form);
-      }
-    };
+  subscribe(subscriber) {
+    this.subscribers.push(subscriber);
+  }
+  unsubscribe(subscriber) {
+    this.subscribers = this.subscribers.filter(s => s !== subscriber);
+  }
+  publish(news) {
+    console.log("📰 Нова новина надійшла:", news.getInfo());
+    this.subscribers.forEach(sub => sub.notify(news));
   }
 }
 
-const currentYear = new Date().getFullYear();
+class User {
+  constructor(name) {
+    this.name = name;
+  }
+  notify(news) {
+    console.log(`👤 ${this.name} отримав новину: ${news.getInfo()}`);
+  }
+}
 
-const rules = [
-  new Rule("username", "Ім’я має бути від 5 до 15 літер", val => /^[A-Za-zА-Яа-яІіЇїЄєҐґ]{5,15}$/.test(val)),
-  new Rule("birthYear", `Рік має бути від 1900 до ${currentYear}`, val => val >= 1900 && val <= currentYear),
-  new Rule("eyeColor", "Оберіть допустимий колір очей", val => ["brown", "green", "gray", "blue"].includes(val)),
-  new Rule("hairColor", "Оберіть допустимий колір волосся", val => ["black", "brown", "white", "red", "other"].includes(val)),
-  new Rule("height", "Зріст має бути від 0 до 2.6 м", val => val > 0 && val <= 2.6),
-  new Rule("weight", "Вага має бути від 0 до 300 кг", val => val > 0 && val <= 300),
-];
+// === Приклад використання ===
+const agency = new NewsAgency();
 
-const domLogger = new DomLogger("errors");
-const validator = new Validator(domLogger, rules);
-const processor = new Processor(validator, (data, form) => {
-  const result = document.getElementById("result");
-  result.innerHTML = "<h3>Дані форми:</h3><pre>" + JSON.stringify(data, null, 2) + "</pre>";
-  form.reset();
-});
+// Створюємо користувачів
+const user1 = new User("Оля");
+const user2 = new User("Андрій");
 
-processor.attach("#user-form");
-</script>
-</body>
-</html>
+// Підписка
+agency.subscribe(user1);
+agency.subscribe(user2);
+
+// Створюємо новину через фабрику
+const news1 = NewsFactory.create("sport", "Україна виграла!", "Наша збірна перемогла 3:1");
+const news2 = NewsFactory.create("politics", "Зміни в уряді", "Новий міністр освіти");
+
+// Публікуємо
+agency.publish(news1);
+agency.publish(news2);
+
+// Відписка та ще одна новина
+agency.unsubscribe(user2);
+const news3 = NewsFactory.create("entertainment", "Прем’єра фільму", "Вийшов новий український блокбастер");
+agency.publish(news3);
