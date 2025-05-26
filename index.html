@@ -1,158 +1,102 @@
 <!DOCTYPE html>
-<html lang="ua">
+<html lang="uk">
 <head>
   <meta charset="UTF-8" />
-  <title>Домашня практика</title>
+  <title>Пости з пагінацією</title>
   <style>
-    body { font-family: Arial; padding: 20px; }
-    label, button { margin: 10px 0; display: block; }
-    video, audio { margin-top: 10px; max-width: 100%; }
-    .lang-switch { margin-top: 20px; }
+    body { font-family: Arial; padding: 20px; max-width: 600px; margin: auto; }
+    .post { border-bottom: 1px solid #ccc; padding: 10px 0; }
+    .pagination { margin-top: 20px; }
+    .pagination button { margin-right: 5px; }
+    input[type="text"] { width: 100%; padding: 8px; margin-bottom: 20px; }
   </style>
 </head>
 <body>
 
-  <h2 id="title">Реєстрація</h2>
+  <h2>Список постів</h2>
+  <input type="text" id="searchInput" placeholder="Пошук за заголовком..." />
 
-  <div class="lang-switch">
-    <label>Мова: 
-      <select id="langSelect">
-        <option value="ua">Українська</option>
-        <option value="en">English</option>
-      </select>
-    </label>
+  <div id="posts"></div>
+  <div class="pagination">
+    <button onclick="prevPage()">⬅️ Попередня</button>
+    <span id="pageNum">Сторінка: 1</span>
+    <button onclick="nextPage()">Наступна ➡️</button>
   </div>
 
-  <form id="loginForm">
-    <label id="loginLabel">Логін: 
-      <input type="text" id="loginInput" required />
-    </label>
-    <button type="submit" id="submitBtn">Зберегти логін</button>
-  </form>
-
-  <p><strong>Збережено в cookie:</strong> <span id="savedLogin">—</span></p>
-  <button onclick="clearAll()">Очистити всі дані</button>
-
-  <hr />
-
-  <button id="cameraBtn">Увімкнути камеру</button>
-  <video id="video" autoplay playsinline></video>
-
-  <hr />
-
-  <button onclick="document.getElementById('audio').play()">▶️ Відтворити аудіо</button>
-  <audio id="audio" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" controls></audio>
-
-  <hr />
-
-  <button id="recordBtn">Почати запис</button>
-  <video id="recordedVideo" controls></video>
-
   <script>
-    const langSelect = document.getElementById("langSelect");
-    const title = document.getElementById("title");
-    const loginLabel = document.getElementById("loginLabel");
-    const submitBtn = document.getElementById("submitBtn");
+    let currentPage = 1;
+    const limit = 10;
+    let searchTerm = "";
+    let controller = null;
 
-    const langText = {
-      ua: {
-        title: "Реєстрація",
-        login: "Логін:",
-        button: "Зберегти логін"
-      },
-      en: {
-        title: "Registration",
-        login: "Login:",
-        button: "Save login"
+    const postsDiv = document.getElementById("posts");
+    const pageNum = document.getElementById("pageNum");
+    const searchInput = document.getElementById("searchInput");
+
+    async function fetchPosts(page = 1, search = "") {
+      if (controller) controller.abort(); // Скасування попереднього запиту
+
+      controller = new AbortController();
+      const signal = controller.signal;
+
+      const url = `https://jsonplaceholder.typicode.com/posts?_page=${page}&_limit=${limit}`;
+      
+      try {
+        const res = await fetch(url, { signal });
+        const posts = await res.json();
+
+        const filtered = search
+          ? posts.filter(p => p.title.toLowerCase().includes(search.toLowerCase()))
+          : posts;
+
+        renderPosts(filtered);
+        pageNum.textContent = `Сторінка: ${page}`;
+      } catch (err) {
+        if (err.name === "AbortError") {
+          console.log("Запит скасовано");
+        } else {
+          console.error("Помилка завантаження:", err);
+        }
       }
-    };
-
-    function setLanguage(lang) {
-      localStorage.setItem("lang", lang);
-      title.textContent = langText[lang].title;
-      loginLabel.innerHTML = `${langText[lang].login} <input type="text" id="loginInput" required />`;
-      submitBtn.textContent = langText[lang].button;
     }
 
-    langSelect.addEventListener("change", (e) => {
-      setLanguage(e.target.value);
-    });
-
-    // Завантаження мови при старті
-    const savedLang = localStorage.getItem("lang") || "ua";
-    langSelect.value = savedLang;
-    setLanguage(savedLang);
-
-    // Реєстрація з cookie
-    const loginForm = document.getElementById("loginForm");
-    const savedLogin = document.getElementById("savedLogin");
-
-    function setCookie(name, value, days = 365) {
-      const d = new Date();
-      d.setTime(d.getTime() + days * 24 * 60 * 60 * 1000);
-      document.cookie = `${name}=${value};expires=${d.toUTCString()};path=/`;
+    function renderPosts(posts) {
+      postsDiv.innerHTML = posts.length
+        ? posts.map(p => `<div class="post"><strong>${p.title}</strong><p>${p.body}</p></div>`).join("")
+        : "<p>Нічого не знайдено.</p>";
     }
 
-    function getCookie(name) {
-      const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
-      return match ? match[2] : null;
+    function nextPage() {
+      currentPage++;
+      fetchPosts(currentPage, searchTerm);
     }
 
-    loginForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const loginValue = document.getElementById("loginInput").value;
-      setCookie("login", loginValue);
-      savedLogin.textContent = loginValue;
-    });
-
-    savedLogin.textContent = getCookie("login") || "—";
-
-    // Очистити всі дані
-    function clearAll() {
-      localStorage.clear();
-      document.cookie.split(";").forEach(c => {
-        document.cookie = c.trim().split("=")[0] + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/";
-      });
-      alert("Всі дані очищено!");
-      location.reload();
+    function prevPage() {
+      if (currentPage > 1) {
+        currentPage--;
+        fetchPosts(currentPage, searchTerm);
+      }
     }
 
-    // Камера
-    const cameraBtn = document.getElementById("cameraBtn");
-    const video = document.getElementById("video");
-
-    cameraBtn.onclick = async () => {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      video.srcObject = stream;
-
-      setTimeout(() => {
-        stream.getTracks().forEach(track => track.stop());
-      }, 3000);
-    };
-
-    // Запис відео
-    const recordBtn = document.getElementById("recordBtn");
-    const recordedVideo = document.getElementById("recordedVideo");
-    let mediaRecorder, chunks = [];
-
-    recordBtn.onclick = async () => {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      mediaRecorder = new MediaRecorder(stream);
-      chunks = [];
-
-      mediaRecorder.ondataavailable = e => chunks.push(e.data);
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(chunks, { type: "video/webm" });
-        recordedVideo.src = URL.createObjectURL(blob);
+    // Дебаунс функція
+    function debounce(fn, delay) {
+      let timer;
+      return function(...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn.apply(this, args), delay);
       };
+    }
 
-      mediaRecorder.start();
+    const onSearch = debounce((e) => {
+      searchTerm = e.target.value;
+      currentPage = 1;
+      fetchPosts(currentPage, searchTerm);
+    }, 500);
 
-      setTimeout(() => {
-        mediaRecorder.stop();
-        stream.getTracks().forEach(track => track.stop());
-      }, 5000);
-    };
+    searchInput.addEventListener("input", onSearch);
+
+    // Початкове завантаження
+    fetchPosts();
   </script>
 </body>
 </html>
