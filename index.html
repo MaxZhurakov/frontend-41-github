@@ -1,147 +1,141 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8">
-  <title>CRUD Пости</title>
+  <meta charset="UTF-8" />
+  <title>Форма з валідацією</title>
   <style>
-    body { font-family: Arial; padding: 20px; max-width: 800px; margin: auto; }
-    input, textarea, button { display: block; margin: 10px 0; padding: 8px; width: 100%; }
-    .post { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
-    .actions button { margin-right: 10px; }
-    #loading { color: green; margin-bottom: 10px; }
-    .error { color: red; }
+    form { max-width: 400px; margin: 20px auto; padding: 20px; border: 1px solid #ccc; }
+    .error { color: red; margin: 5px 0; font-size: 0.9em; }
+    .result { border-top: 1px solid #ccc; padding-top: 20px; margin-top: 20px; }
   </style>
 </head>
 <body>
 
-  <h2>Створити новий пост</h2>
-  <div id="errorMsg" class="error"></div>
-  <form id="postForm">
-    <input type="text" id="title" placeholder="Заголовок" required>
-    <textarea id="body" placeholder="Опис" required></textarea>
-    <button type="submit">Створити пост</button>
+  <form id="user-form">
+    <label>Ім’я користувача: <input name="username" /></label><br><br>
+    <label>Рік народження: <input name="birthYear" type="number" /></label><br><br>
+    <label>Колір очей: 
+      <select name="eyeColor">
+        <option value="">Оберіть</option>
+        <option>brown</option><option>green</option><option>gray</option><option>blue</option>
+      </select>
+    </label><br><br>
+    <label>Колір волосся:
+      <select name="hairColor">
+        <option value="">Оберіть</option>
+        <option>black</option><option>brown</option><option>white</option><option>red</option><option>other</option>
+      </select>
+    </label><br><br>
+    <label>Зріст (м): <input name="height" type="number" step="0.01" /></label><br><br>
+    <label>Вага (кг): <input name="weight" type="number" /></label><br><br>
+    <button type="submit">Надіслати</button>
+    <div id="errors" class="error"></div>
   </form>
 
-  <h2>Список постів</h2>
-  <div id="loading">Завантаження...</div>
-  <div id="posts"></div>
+  <div id="result" class="result"></div>
 
-  <script>
-    const postForm = document.getElementById('postForm');
-    const titleInput = document.getElementById('title');
-    const bodyInput = document.getElementById('body');
-    const postsDiv = document.getElementById('posts');
-    const loading = document.getElementById('loading');
-    const errorMsg = document.getElementById('errorMsg');
+<script>
+class Rule {
+  constructor(name, errorText, validateFn) {
+    this.name = name;
+    this.errorText = errorText;
+    this.validateFn = validateFn;
+  }
+  isValid(value) {
+    return this.validateFn(value);
+  }
+}
 
-    async function loadPosts() {
-      loading.style.display = 'block';
-      postsDiv.innerHTML = '';
-      try {
-        const res = await fetch('https://jsonplaceholder.typicode.com/posts?_limit=10');
-        const data = await res.json();
-        data.forEach(renderPost);
-      } catch (error) {
-        showError("Помилка завантаження постів.");
-      } finally {
-        loading.style.display = 'none';
+class ConsoleLogger {
+  log(msg) {
+    console.error("ConsoleLogger:", msg);
+  }
+}
+
+class AlertLogger {
+  log(msg) {
+    alert("AlertLogger: " + msg);
+  }
+}
+
+class DomLogger {
+  constructor(containerId) {
+    this.container = document.getElementById(containerId);
+  }
+  log(msg) {
+    const p = document.createElement("p");
+    p.textContent = msg;
+    this.container.appendChild(p);
+  }
+  clear() {
+    this.container.innerHTML = "";
+  }
+}
+
+class Validator {
+  constructor(logger, rules = []) {
+    this.logger = logger;
+    this.rules = rules;
+  }
+
+  validate(form) {
+    let isValid = true;
+    if (this.logger.clear) this.logger.clear();
+
+    for (let rule of this.rules) {
+      const el = form.elements[rule.name];
+      const value = el.value.trim();
+      if (!rule.isValid(value)) {
+        this.logger.log(`${rule.name}: ${rule.errorText}`);
+        isValid = false;
       }
     }
 
-    postForm.addEventListener('submit', async (e) => {
+    return isValid;
+  }
+}
+
+class Processor {
+  constructor(validator, success) {
+    this.validator = validator;
+    this.success = success;
+  }
+
+  attach(formSelector) {
+    const form = document.querySelector(formSelector);
+    form.onsubmit = (e) => {
       e.preventDefault();
-      const title = titleInput.value.trim();
-      const body = bodyInput.value.trim();
-
-      if (!title || !body) return;
-
-      try {
-        const res = await fetch('https://jsonplaceholder.typicode.com/posts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title, body }),
-        });
-        const newPost = await res.json();
-        renderPost(newPost, true);
-        postForm.reset();
-      } catch (error) {
-        showError("Не вдалося створити пост.");
+      if (this.validator.validate(form)) {
+        const data = {};
+        for (let el of form.elements) {
+          if (el.name) data[el.name] = el.value.trim();
+        }
+        this.success(data, form);
       }
-    });
+    };
+  }
+}
 
-    function renderPost(post, prepend = false) {
-      const div = document.createElement('div');
-      div.className = 'post';
-      div.dataset.id = post.id;
+const currentYear = new Date().getFullYear();
 
-      div.innerHTML = `
-        <h3>${post.title}</h3>
-        <p>${post.body}</p>
-        <div class="actions">
-          <button onclick="editPost(${post.id})">Редагувати</button>
-          <button onclick="deletePost(${post.id})">Видалити</button>
-        </div>
-      `;
+const rules = [
+  new Rule("username", "Ім’я має бути від 5 до 15 літер", val => /^[A-Za-zА-Яа-яІіЇїЄєҐґ]{5,15}$/.test(val)),
+  new Rule("birthYear", `Рік має бути від 1900 до ${currentYear}`, val => val >= 1900 && val <= currentYear),
+  new Rule("eyeColor", "Оберіть допустимий колір очей", val => ["brown", "green", "gray", "blue"].includes(val)),
+  new Rule("hairColor", "Оберіть допустимий колір волосся", val => ["black", "brown", "white", "red", "other"].includes(val)),
+  new Rule("height", "Зріст має бути від 0 до 2.6 м", val => val > 0 && val <= 2.6),
+  new Rule("weight", "Вага має бути від 0 до 300 кг", val => val > 0 && val <= 300),
+];
 
-      prepend ? postsDiv.prepend(div) : postsDiv.appendChild(div);
-    }
+const domLogger = new DomLogger("errors");
+const validator = new Validator(domLogger, rules);
+const processor = new Processor(validator, (data, form) => {
+  const result = document.getElementById("result");
+  result.innerHTML = "<h3>Дані форми:</h3><pre>" + JSON.stringify(data, null, 2) + "</pre>";
+  form.reset();
+});
 
-    async function deletePost(id) {
-      try {
-        await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
-          method: 'DELETE'
-        });
-        document.querySelector(`.post[data-id="${id}"]`).remove();
-      } catch {
-        showError("Не вдалося видалити пост.");
-      }
-    }
-
-    async function editPost(id) {
-      const postDiv = document.querySelector(`.post[data-id="${id}"]`);
-      const currentTitle = postDiv.querySelector('h3').textContent;
-      const currentBody = postDiv.querySelector('p').textContent;
-
-      postDiv.innerHTML = `
-        <input type="text" id="editTitle${id}" value="${currentTitle}">
-        <textarea id="editBody${id}">${currentBody}</textarea>
-        <button onclick="updatePost(${id})">Оновити</button>
-        <button onclick="loadPosts()">Скасувати</button>
-      `;
-    }
-
-    async function updatePost(id) {
-      const newTitle = document.getElementById(`editTitle${id}`).value.trim();
-      const newBody = document.getElementById(`editBody${id}`).value.trim();
-
-      try {
-        const res = await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title: newTitle, body: newBody })
-        });
-
-        const updatedPost = await res.json();
-        document.querySelector(`.post[data-id="${id}"]`).innerHTML = `
-          <h3>${updatedPost.title}</h3>
-          <p>${updatedPost.body}</p>
-          <div class="actions">
-            <button onclick="editPost(${id})">Редагувати</button>
-            <button onclick="deletePost(${id})">Видалити</button>
-          </div>
-        `;
-      } catch {
-        showError("Не вдалося оновити пост.");
-      }
-    }
-
-    function showError(message) {
-      errorMsg.textContent = message;
-      setTimeout(() => errorMsg.textContent = '', 4000);
-    }
-
-    loadPosts();
-  </script>
-
+processor.attach("#user-form");
+</script>
 </body>
 </html>
