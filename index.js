@@ -1,69 +1,101 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-function MoodCard({ mood, comment }) {
-  let bgColor;
+function UserSurveyForm() {
+  const [formData, setFormData] = useState({
+    age: "",
+    gender: "Чоловік",
+    usedReact: false,
+  });
 
-  switch (mood) {
-    case "😊":
-      bgColor = "lightgreen";
-      break;
-    case "😐":
-      bgColor = "lightgray";
-      break;
-    case "😞":
-      bgColor = "lightcoral";
-      break;
-    default:
-      bgColor = "#f0f0f0";
-  }
+  const [changeCount, setChangeCount] = useState(0);
+  const [submitted, setSubmitted] = useState(false);
 
-  const cardStyle = {
-    backgroundColor: bgColor,
-    padding: "16px",
-    borderRadius: "8px",
-    marginTop: "20px",
-    textAlign: "center",
+  useEffect(() => {
+    if (formData.age !== "" || formData.gender !== "Чоловік" || formData.usedReact !== false) {
+      setChangeCount((prev) => prev + 1);
+    }
+  }, [formData.age, formData.gender, formData.usedReact]);
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setSubmitted(true);
   };
 
   return (
-    <div style={cardStyle}>
-      <h2>
-        Ваш настрій сьогодні: {mood || "❓ Настрій не вказано"}
-      </h2>
-      {comment && <p>Коментар: "{comment}"</p>}
-    </div>
-  );
-}
-
-// Головний компонент
-function App() {
-  const [mood, setMood] = useState("");
-  const [comment, setComment] = useState("");
-
-  return (
     <div style={{ maxWidth: "400px", margin: "0 auto", padding: "20px" }}>
-      <h1>🌤 Mood Tracker</h1>
+      <h1>📋 Опитування користувача</h1>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label>
+            Вік:
+            <input
+              type="number"
+              name="age"
+              value={formData.age}
+              onChange={handleChange}
+              style={{ marginLeft: "10px" }}
+            />
+          </label>
+        </div>
 
-      <div>
-        <p>Обери настрій:</p>
-        <button onClick={() => setMood("😊")}>😊</button>
-        <button onClick={() => setMood("😐")}>😐</button>
-        <button onClick={() => setMood("😞")}>😞</button>
-      </div>
+        <div style={{ marginTop: "10px" }}>
+          <label>
+            Стать:
+            <select
+              name="gender"
+              value={formData.gender}
+              onChange={handleChange}
+              style={{ marginLeft: "10px" }}
+            >
+              <option>Чоловік</option>
+              <option>Жінка</option>
+              <option>Інше</option>
+            </select>
+          </label>
+        </div>
 
-      <div style={{ marginTop: "10px" }}>
-        <input
-          type="text"
-          placeholder="Що вплинуло на твій настрій?"
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          style={{ width: "100%", padding: "8px", borderRadius: "4px" }}
-        />
-      </div>
+        <div style={{ marginTop: "10px" }}>
+          <label>
+            <input
+              type="checkbox"
+              name="usedReact"
+              checked={formData.usedReact}
+              onChange={handleChange}
+            />{" "}
+            Чи користувався React раніше?
+          </label>
+        </div>
 
-      <MoodCard mood={mood} comment={comment} />
+        <button
+          type="submit"
+          style={{ marginTop: "15px", padding: "8px 12px", cursor: "pointer" }}
+        >
+          Надіслати
+        </button>
+      </form>
+      <p style={{ marginTop: "15px" }}>
+        Кількість змін у формі: {changeCount}
+      </p>
+      {changeCount > 10 && <p>😄 Та ти не можеш визначитися!</p>}
+      {submitted && (
+        <div style={{ marginTop: "20px", padding: "10px", border: "1px solid #ccc" }}>
+          <h3>✅ Підсумок:</h3>
+          <p>
+            Вам {formData.age || "N/A"} років, ви обрали стать: {formData.gender}, і
+            вже користувались React: {formData.usedReact ? "Так" : "Ні"}.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
 
-export default App;
+export default UserSurveyForm;
