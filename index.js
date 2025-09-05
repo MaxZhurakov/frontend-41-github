@@ -1,38 +1,51 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
-function useLocalStorage(key, initialValue) {
-  const [value, setValue] = useState(() => {
-    const saved = localStorage.getItem(key);
-    return saved !== null ? JSON.parse(saved) : initialValue;
-  });
+function DreamShop() {
+  const products = [
+    { id: 1, name: "Ноутбук", price: 25000, inStock: true },
+    { id: 2, name: "Смартфон", price: 15000, inStock: false },
+    { id: 3, name: "Навушники", price: 2000, inStock: true },
+    { id: 4, name: "Монітор", price: 7000, inStock: false },
+  ];
 
-  useEffect(() => {
-    localStorage.setItem(key, JSON.stringify(value));
-  }, [key, value]);
+  const [showOnlyInStock, setShowOnlyInStock] = useState(false);
 
-  return [value, setValue];
-}
+  let visibleProducts = [...products];
+  if (showOnlyInStock) {
+    visibleProducts = visibleProducts.filter((p) => p.inStock);
+  }
+  visibleProducts.sort((a, b) => a.price - b.price);
 
-function App() {
-  const [name, setName] = useLocalStorage("username", ""); // збережемо під ключем "username"
+  const inStockCount = products.filter((p) => p.inStock).length;
 
   return (
     <div style={{ padding: "20px" }}>
-      <h1>📦 useLocalStorage Hook</h1>
-      <label>
-        Введіть ім'я:{" "}
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          style={{ padding: "6px", marginLeft: "10px" }}
-        />
-      </label>
+      <h1>🛍 DreamShop</h1>
 
-      <p style={{ marginTop: "15px" }}>Збережене ім'я: <b>{name}</b></p>
-      <p>(Спробуйте оновити сторінку — значення залишиться 👌)</p>
+      <button onClick={() => setShowOnlyInStock((prev) => !prev)}>
+        {showOnlyInStock ? "Показати всі товари" : "Показати тільки в наявності"}
+      </button>
+
+      {visibleProducts.length === 0 ? (
+        <p style={{ marginTop: "15px" }}>Наразі немає товарів</p>
+      ) : (
+        <ul style={{ marginTop: "15px" }}>
+          {visibleProducts.map((product) => (
+            <li key={product.id}>
+              {product.name} —{" "}
+              {product.inStock ? `${product.price} грн` : "Немає в наявності"}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {inStockCount === 0 ? (
+        <p style={{ color: "red" }}>Склад порожній</p>
+      ) : (
+        <p>Товарів у наявності: {inStockCount}</p>
+      )}
     </div>
   );
 }
 
-export default App;
+export default DreamShop;
