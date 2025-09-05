@@ -1,0 +1,115 @@
+class Product {
+  constructor(name, price, category) {
+    this.name = name;
+    this.price = price;
+    this.category = category;
+  }
+}
+
+class ProductValidator {
+  static validate(product) {
+    if (!product.name || product.name.trim() === '') {
+      throw new Error("❌ Назва товару не може бути порожньою");
+    }
+    if (product.price <= 0) {
+      throw new Error("❌ Ціна повинна бути більше 0");
+    }
+  }
+}
+
+class Database {
+  save(product) {
+    throw new Error("Метод save() має бути реалізований у підкласі");
+  }
+}
+
+class MySQLDatabase extends Database {
+  save(product) {
+    console.log(`💾 MySQL: Товар "${product.name}" збережено у базі.`);
+  }
+}
+
+class MongoDatabase extends Database {
+  save(product) {
+    console.log(`💾 MongoDB: Товар "${product.name}" збережено у базі.`);
+  }
+}
+
+class ProductRepository {
+  constructor(database) {
+    this.database = database;
+  }
+
+  save(product) {
+    this.database.save(product);
+  }
+}
+
+class PaymentMethod {
+  pay(amount) {
+    throw new Error("Метод pay() має бути реалізований у підкласі");
+  }
+}
+
+class ApplePay extends PaymentMethod {
+  pay(amount) {
+    console.log(`🍎 ApplePay: Оплачено ${amount} грн.`);
+  }
+}
+
+class GooglePay extends PaymentMethod {
+  pay(amount) {
+    console.log(`🤖 GooglePay: Оплачено ${amount} грн.`);
+  }
+}
+
+class NotificationService {
+  static send(message) {
+    console.log(`📩 Повідомлення клієнту: ${message}`);
+  }
+}
+
+class RestApiClient {
+  fetchProducts() {
+    return Promise.resolve([
+      new Product("Кава", 100, "Напої"),
+      new Product("Книга", 250, "Канцелярія")
+    ]);
+  }
+}
+
+class ProductService {
+  constructor(apiClient) {
+    this.apiClient = apiClient;
+  }
+
+  async fetchProducts() {
+    const products = await this.apiClient.fetchProducts();
+    console.log("📦 Список товарів з API:");
+    console.table(products);
+  }
+}
+
+(async function main() {
+  try {
+    const product = new Product("Ноутбук", 15000, "Електроніка");
+
+    ProductValidator.validate(product);
+
+    const database = new MySQLDatabase(); 
+    const repo = new ProductRepository(database);
+    repo.save(product);
+
+    const payment = new GooglePay(); 
+    payment.pay(product.price);
+
+    NotificationService.send("Оплата пройшла успішно!");
+
+    const apiClient = new RestApiClient();
+    const productService = new ProductService(apiClient);
+    await productService.fetchProducts();
+
+  } catch (error) {
+    console.error("❗ Помилка:", error.message);
+  }
+})();
