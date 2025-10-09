@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Converse Shop</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+    <h1>Converse Shop</h1>
+    <nav>
+        <a href="#" onclick="filterTopCategory('Новинки')">Новинки</a>
+        <a href="#" onclick="filterTopCategory('Жіночі')">Жіночі</a>
+        <a href="#" onclick="filterTopCategory('Чоловічі')">Чоловічі</a>
+        <a href="#" onclick="filterTopCategory('Дітям')">Для дітей</a>
+        <a href="#" onclick="filterTopCategory('Лімітовані')">Лімітовані</a>
+        <a href="#" onclick="showSearch()">Пошук</a>
+        <a href="#" onclick="showFavorites()">Улюблені</a>
+        <a href="#" onclick="showCart()">Кошик (<span id="cart-count">0</span>)</a>
+        <a href="#" onclick="showProfile()">Профіль</a>
+    </nav>
+</header>
+
+<div class="container">
+    <div class="sidebar" id="sidebar">
+        <h3>Категорії</h3>
+        <ul>
+            <li onclick="showProducts('All')">Усі</li>
+            <li onclick="showProducts('High')">Високі</li>
+            <li onclick="showProducts('Low')">Низькі</li>
+            <li onclick="showProducts('Classic')">Класичні</li>
+        </ul>
+
+        <h3>Фільтри</h3>
+        <label>Розмір:</label>
+        <select id="filter-size" onchange="applyFilters()">
+            <option value="All">Усі</option>
+            <option value="36">36</option>
+            <option value="37">37</option>
+            <option value="38">38</option>
+            <option value="39">39</option>
+            <option value="40">40</option>
+            <option value="41">41</option>
+            <option value="42">42</option>
+        </select>
+
+        <label>Колір:</label>
+        <select id="filter-color" onchange="applyFilters()">
+            <option value="All">Усі</option>
+            <option value="Black">Чорний</option>
+            <option value="White">Білий</option>
+            <option value="Red">Червоний</option>
+            <option value="Green">Зелені</option>
+        </select>
+
+        <label>Ціна до:</label>
+        <input type="number" id="filter-price" placeholder="Макс. ціна" onchange="applyFilters()">
+    </div>
+
+    <div class="main" id="main-content"></div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
